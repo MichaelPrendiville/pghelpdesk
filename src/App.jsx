@@ -139,7 +139,6 @@ function SupplierItem({ supplier, index }) {
     <div style={{ borderBottom: `1px solid ${T.border}` }}>
       <button onClick={() => setOpen(!open)} style={{ width: "100%", background: "none", border: "none", padding: "18px 0", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, cursor: "pointer", textAlign: "left" }}>
         <span style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <span style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textXMuted, minWidth: 20 }}>{String(index + 1).padStart(2, "0")}</span>
           <span style={{ fontFamily: T.fontSans, fontSize: 17, color: T.text, fontWeight: 400, lineHeight: 1.3 }}>{supplier.business}</span>
         </span>
         <span style={{ fontFamily: T.fontMono, fontSize: 16, color: T.textMuted, flexShrink: 0, transform: open ? "rotate(45deg)" : "rotate(0deg)", transition: "transform 0.25s ease", display: "block" }}>+</span>
@@ -267,6 +266,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin }) {
 
       {/* ── FAQs Section ── */}
       <div ref={faqRef} style={{ maxWidth: 680, margin: "0 auto", padding: "48px 20px 80px" }} onClick={() => setDropdownOpen(false)}>
+        <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 8 }}>FAQs</h2>
         <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 24, maxWidth: 480 }}>
           Browse answers to common questions. Can't find what you're looking for? Get in touch with our support team.
         </p>
