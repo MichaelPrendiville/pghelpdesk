@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 // ── Supabase client ──────────────────────────────────────────────────────────
 const SUPABASE_URL = "https://vvvnmqbnjtnakjfwflgy.supabase.co";
@@ -131,143 +131,110 @@ function AccordionItem({ faq, index }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// PUBLIC PAGE
+// PUBLIC SITE (single scrolling page)
 // ═══════════════════════════════════════════════════════════════════════════════
-function PublicPage({ faqs, onGoAdmin, onGoFAQs, onGoSuppliers, onGoResources, showContent, setShowContent, onGoHome }) {
+function PublicSite({ faqs, suppliers, resources, onGoAdmin }) {
+  const [activeTab, setActiveTab] = useState("faqs");
   const [query, setQuery] = useState("");
   const [topic, setTopic] = useState("All Topics");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [catDropdownOpen, setCatDropdownOpen] = useState(false);
+  const [category, setCategory] = useState("All Categories");
+
+  const faqRef = useRef(null);
+  const suppliersRef = useRef(null);
+  const resourcesRef = useRef(null);
 
   const topics = ["All Topics", ...Array.from(new Set(faqs.map(f => f.topic).filter(Boolean)))];
-
-  const filtered = faqs.filter(f => {
+  const faqFiltered = faqs.filter(f => {
     const matchesQuery = f.question.toLowerCase().includes(query.toLowerCase()) || f.answer.toLowerCase().includes(query.toLowerCase());
     const matchesTopic = topic === "All Topics" || f.topic === topic;
     return matchesQuery && matchesTopic;
   });
 
-  // ── LANDING (hero) view ──────────────────────────────────────────
-  if (!showContent) {
-    return (
-      <div style={{ minHeight: "100vh", fontFamily: T.fontSans }}>
-        <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }`}</style>
-        <div style={{ width: "100%", height: "100vh", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-          <img src={HERO_SRC} alt="Hero" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(20,16,12,0.75) 0%, rgba(20,16,12,0.55) 50%, rgba(20,16,12,0.85) 100%)" }} />
+  const categories = ["All Categories", ...Array.from(new Set(suppliers.map(s => s.category).filter(Boolean)))];
+  const suppliersFiltered = category === "All Categories" ? suppliers : suppliers.filter(s => s.category === category);
 
-          {/* Logo */}
-          <div style={{ position: "absolute", top: 28, left: 0, right: 0, textAlign: "center" }}>
-            <p style={{ fontFamily: "'Playfair Display', 'Georgia', serif", fontSize: "clamp(0.95rem, 2vw, 1.25rem)", fontWeight: 400, color: "#ffffff", letterSpacing: "0.05em", textShadow: "0 1px 8px rgba(0,0,0,0.4)", margin: 0 }}>Prendiville Group</p>
-          </div>
-
-          {/* Hero text + nav buttons */}
-          <div style={{ position: "relative", textAlign: "center", padding: "0 24px" }}>
-            <p style={{ fontFamily: T.fontMono, fontSize: 11, color: "rgba(255,255,255,0.6)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 16 }}>PG Create</p>
-            <h1 style={{ fontFamily: T.fontSans, fontSize: "clamp(2.5rem, 7vw, 5rem)", fontWeight: 300, color: "#ffffff", letterSpacing: "-1.5px", lineHeight: 1.05, marginBottom: 20 }}>
-              How can we help?
-            </h1>
-            <p style={{ fontFamily: T.fontSans, fontSize: 16, color: "rgba(255,255,255,0.7)", lineHeight: 1.6, maxWidth: 420, margin: "0 auto 40px" }}>
-              Browse answers to common questions below.
-            </p>
-
-            {/* Nav buttons */}
-            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-              {[
-                { label: "FAQs", action: onGoFAQs },
-                { label: "Preferred Suppliers", action: onGoSuppliers },
-                { label: "Resources", action: onGoResources },
-              ].map(btn => (
-                <button key={btn.label} onClick={btn.action} style={{
-                  fontFamily: T.fontSans, fontSize: 14, fontWeight: 500,
-                  color: "#ffffff", background: "rgba(255,255,255,0.12)",
-                  border: "1.5px solid rgba(255,255,255,0.5)",
-                  borderRadius: 6, padding: "12px 28px",
-                  cursor: "pointer", letterSpacing: "0.02em",
-                  backdropFilter: "blur(8px)",
-                  transition: "background 0.2s, border-color 0.2s",
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.25)"; e.currentTarget.style.borderColor = "#ffffff"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.12)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.5)"; }}
-                >
-                  {btn.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Admin link */}
-          <div style={{ position: "absolute", bottom: 28, left: 0, right: 0, textAlign: "center" }}>
-            <button onClick={onGoAdmin} style={{ fontFamily: T.fontSans, fontSize: 12, color: "rgba(255,255,255,0.35)", background: "none", border: "none", cursor: "pointer", letterSpacing: "0.05em" }}>
-              Admin login
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+  function scrollTo(ref, tab) {
+    setActiveTab(tab);
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  // ── CONTENT view (no hero) ───────────────────────────────────────
-  return (
-    <div style={{ minHeight: "100vh", background: T.bg, fontFamily: T.fontSans }} onClick={() => setDropdownOpen(false)}>
-      <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} } input::placeholder { color: #aaa89f; } select { appearance: none; }`}</style>
+  function getIcon(name) {
+    const ext = name.split(".").pop().toLowerCase();
+    return { pdf: "📄", docx: "📄", doc: "📄", xlsx: "📊", xls: "📊" }[ext] || "📎";
+  }
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / 1048576).toFixed(1) + " MB";
+  }
+  function download(r) {
+    const a = document.createElement("a"); a.href = r.data; a.download = r.name; a.click();
+  }
 
-      {/* Nav tabs */}
+  return (
+    <div style={{ minHeight: "100vh", background: T.bg, fontFamily: T.fontSans }} onClick={() => { setDropdownOpen(false); setCatDropdownOpen(false); }}>
+      <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} } input::placeholder { color: #aaa89f; }`}</style>
+
+      {/* ── Hero ── */}
+      <div style={{ width: "100%", height: "100vh", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+        <img src={HERO_SRC} alt="Hero" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(20,16,12,0.75) 0%, rgba(20,16,12,0.55) 50%, rgba(20,16,12,0.85) 100%)" }} />
+        <div style={{ position: "absolute", top: 28, left: 0, right: 0, textAlign: "center" }}>
+          <p style={{ fontFamily: "\'Playfair Display\', \'Georgia\', serif", fontSize: "clamp(0.95rem, 2vw, 1.25rem)", fontWeight: 400, color: "#ffffff", letterSpacing: "0.05em", textShadow: "0 1px 8px rgba(0,0,0,0.4)", margin: 0 }}>Prendiville Group</p>
+        </div>
+        <div style={{ position: "relative", textAlign: "center", padding: "0 24px" }}>
+          <p style={{ fontFamily: T.fontMono, fontSize: 11, color: "rgba(255,255,255,0.6)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 16 }}>PG Create</p>
+          <h1 style={{ fontFamily: T.fontSans, fontSize: "clamp(2.5rem, 7vw, 5rem)", fontWeight: 300, color: "#ffffff", letterSpacing: "-1.5px", lineHeight: 1.05, marginBottom: 40 }}>How can we help?</h1>
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+            {[{ label: "FAQs", ref: faqRef, tab: "faqs" }, { label: "Preferred Suppliers", ref: suppliersRef, tab: "suppliers" }, { label: "Resources", ref: resourcesRef, tab: "resources" }].map(btn => (
+              <button key={btn.label} onClick={() => scrollTo(btn.ref, btn.tab)} style={{ fontFamily: T.fontSans, fontSize: 14, fontWeight: 500, color: "#ffffff", background: "rgba(255,255,255,0.12)", border: "1.5px solid rgba(255,255,255,0.5)", borderRadius: 6, padding: "12px 28px", cursor: "pointer", backdropFilter: "blur(8px)" }}>
+                {btn.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div style={{ position: "absolute", bottom: 36, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+          <span style={{ fontFamily: T.fontMono, fontSize: 10, color: "rgba(255,255,255,0.5)", letterSpacing: "0.15em" }}>SCROLL</span>
+          <div style={{ width: 1, height: 40, background: "linear-gradient(to bottom, rgba(255,255,255,0.5), transparent)" }} />
+        </div>
+        <div style={{ position: "absolute", bottom: 28, right: 24 }}>
+          <button onClick={onGoAdmin} style={{ fontFamily: T.fontSans, fontSize: 12, color: "rgba(255,255,255,0.35)", background: "none", border: "none", cursor: "pointer" }}>Admin</button>
+        </div>
+      </div>
+
+      {/* ── Sticky tab bar ── */}
       <div style={{ background: T.bg, padding: "0 20px", borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 10 }}>
         <div style={{ maxWidth: 680, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex" }}>
-            <button style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, fontWeight: 500, background: "none", border: "none", borderBottom: `2px solid ${T.text}`, padding: "0 16px", height: 52, cursor: "pointer" }}>FAQs</button>
-            <button onClick={onGoSuppliers} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, background: "none", border: "none", borderBottom: "2px solid transparent", padding: "0 16px", height: 52, cursor: "pointer" }}>Preferred Suppliers</button>
-            <button onClick={onGoResources} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, background: "none", border: "none", borderBottom: "2px solid transparent", padding: "0 16px", height: 52, cursor: "pointer" }}>Resources</button>
+            {[{ label: "FAQs", tab: "faqs", ref: faqRef }, { label: "Preferred Suppliers", tab: "suppliers", ref: suppliersRef }, { label: "Resources", tab: "resources", ref: resourcesRef }].map(t => (
+              <button key={t.tab} onClick={() => scrollTo(t.ref, t.tab)} style={{ fontFamily: T.fontSans, fontSize: 14, color: activeTab === t.tab ? T.text : T.textMuted, fontWeight: activeTab === t.tab ? 500 : 400, background: "none", border: "none", borderBottom: activeTab === t.tab ? `2px solid ${T.text}` : "2px solid transparent", padding: "0 16px", height: 52, cursor: "pointer", transition: "all 0.15s" }}>
+                {t.label}
+              </button>
+            ))}
           </div>
-          <button onClick={() => { if (typeof onGoHome === "function") onGoHome(); else setShowContent(false); }} style={{ fontFamily: T.fontSans, fontSize: 12, color: T.textXMuted, background: "none", border: "none", cursor: "pointer", letterSpacing: "0.05em" }}>← Home</button>
+          <button onClick={onGoAdmin} style={{ fontFamily: T.fontSans, fontSize: 12, color: T.textXMuted, background: "none", border: "none", cursor: "pointer" }}>Admin</button>
         </div>
       </div>
 
-      {/* Page content */}
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "32px 20px 80px" }}>
-        <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 24, marginTop: 24, maxWidth: 480 }}>
+      {/* ── FAQs Section ── */}
+      <div ref={faqRef} style={{ maxWidth: 680, margin: "0 auto", padding: "48px 20px 80px" }} onClick={() => setDropdownOpen(false)}>
+        <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 24, maxWidth: 480 }}>
           Browse answers to common questions. Can't find what you're looking for? Get in touch with our support team.
         </p>
-
         <div style={{ borderTop: `1px solid ${T.border}`, marginBottom: 24 }} />
 
-        {/* All Topics dropdown */}
-        <div style={{ position: "relative", marginBottom: 10 }} onClick={e => e.stopPropagation()}>
-          <button
-            onClick={() => setDropdownOpen(o => !o)}
-            style={{
-              display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6,
-              width: "100%",
-              fontFamily: T.fontSans, fontSize: 13, color: T.text,
-              background: "transparent", border: `1px solid ${T.text}`,
-              borderRadius: 6, padding: "10px 12px", cursor: "pointer",
-              transition: "border-color 0.15s",
-            }}
-          >
-            <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 12 }}>☰</span>
-              {topic}
-            </span>
+        {/* Topic dropdown */}
+        <div style={{ position: "relative", marginBottom: 16 }} onClick={e => e.stopPropagation()}>
+          <button onClick={() => setDropdownOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", fontFamily: T.fontSans, fontSize: 13, color: T.text, background: "transparent", border: `1px solid ${T.text}`, borderRadius: 6, padding: "10px 12px", cursor: "pointer" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 12 }}>☰</span>{topic}</span>
             <span style={{ fontSize: 10, transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", display: "inline-block" }}>▾</span>
           </button>
           {dropdownOpen && (
-            <div style={{
-              position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0,
-              background: T.bg, border: `1px solid ${T.border}`,
-              borderRadius: 6, overflow: "hidden", zIndex: 20,
-              boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-              animation: "fadeUp 0.15s ease",
-            }}>
+            <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 6, overflow: "hidden", zIndex: 20, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", animation: "fadeUp 0.15s ease" }}>
               {topics.map(t => (
-                <button key={t} onClick={() => { setTopic(t); setDropdownOpen(false); }} style={{
-                  display: "block", width: "100%", textAlign: "left",
-                  padding: "10px 14px", fontFamily: T.fontSans, fontSize: 13,
-                  color: t === topic ? T.text : T.textMuted,
-                  fontWeight: t === topic ? 500 : 400,
-                  background: t === topic ? T.bg : "none",
-                  border: "none", cursor: "pointer",
-                  borderBottom: `1px solid ${T.border}`,
-                }}>
+                <button key={t} onClick={() => { setTopic(t); setDropdownOpen(false); }} style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", fontFamily: T.fontSans, fontSize: 13, color: t === topic ? T.text : T.textMuted, fontWeight: t === topic ? 500 : 400, background: "none", border: "none", cursor: "pointer", borderBottom: `1px solid ${T.border}` }}>
                   {t === topic && <span style={{ marginRight: 6, fontSize: 10 }}>✓</span>}{t}
                 </button>
               ))}
@@ -275,231 +242,91 @@ function PublicPage({ faqs, onGoAdmin, onGoFAQs, onGoSuppliers, onGoResources, s
           )}
         </div>
 
-        {/* Search bar */}
-        <div style={{ position: "relative", marginBottom: 20 }}>
-          <span style={{
-            position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
-            color: T.text, fontSize: 14, pointerEvents: "none", lineHeight: 1,
-          }}>⌕</span>
-          <input
-            type="text"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder="Search FAQs…"
-            style={{
-              width: "100%", padding: "10px 36px 10px 34px",
-              border: `1px solid ${T.text}`, borderRadius: 6,
-              fontFamily: T.fontSans, fontSize: 14, color: T.text,
-              background: "transparent", outline: "none",
-              transition: "border-color 0.15s",
-            }}
-          />
-          {query && (
-            <button onClick={() => setQuery("")} style={{
-              position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
-              background: "none", border: "none", cursor: "pointer",
-              color: T.textMuted, fontSize: 16, lineHeight: 1, padding: 2,
-            }}>×</button>
-          )}
+        {/* Search */}
+        <div style={{ position: "relative", marginBottom: 24 }}>
+          <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: T.text, fontSize: 14, pointerEvents: "none" }}>⌕</span>
+          <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search FAQs…" style={{ width: "100%", padding: "10px 36px 10px 34px", border: `1px solid ${T.text}`, borderRadius: 6, fontFamily: T.fontSans, fontSize: 14, color: T.text, background: "transparent", outline: "none" }} />
+          {query && <button onClick={() => setQuery("")} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: T.textMuted, fontSize: 16 }}>×</button>}
         </div>
 
-        {/* FAQ card */}
-        <div style={{
-          animation: "fadeUp 0.4s ease",
-        }}>
-
-
-          {/* Accordion */}
-          {faqs.length === 0 ? (
-            <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textXMuted, padding: "24px 0", textAlign: "center" }}>No FAQs published yet.</p>
-          ) : filtered.length === 0 ? (
-            <div style={{ padding: "28px 0", textAlign: "center" }}>
+        {/* FAQ list */}
+        <div style={{ borderTop: `1px solid ${T.border}` }}>
+          {faqs.length === 0 && <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textXMuted, padding: "24px 0", textAlign: "center" }}>No FAQs published yet.</p>}
+          {faqs.length > 0 && faqFiltered.length === 0 && (
+            <div style={{ padding: "24px 0" }}>
               <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.text, marginBottom: 6 }}>No results found</p>
-              <p style={{ fontFamily: T.fontSans, fontSize: 13, color: T.textXMuted }}>Try a different search term</p>
+              <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted }}>Try a different search term or topic.</p>
             </div>
+          )}
+          {faqFiltered.map((faq, i) => <AccordionItem key={faq.id} faq={faq} index={i} />)}
+        </div>
+      </div>
+
+      {/* ── Preferred Suppliers Section ── */}
+      <div ref={suppliersRef} style={{ borderTop: `8px solid ${T.border}`, background: T.bg }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "48px 20px 80px" }} onClick={e => e.stopPropagation()}>
+          <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 8 }}>Preferred Suppliers</h2>
+          <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 24 }}>Our trusted network of preferred suppliers and service providers.</p>
+
+          {/* Category dropdown */}
+          <div style={{ position: "relative", marginBottom: 24 }} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setCatDropdownOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", fontFamily: T.fontSans, fontSize: 13, color: T.text, background: "transparent", border: `1px solid ${T.text}`, borderRadius: 6, padding: "10px 12px", cursor: "pointer" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 12 }}>☰</span>{category}</span>
+              <span style={{ fontSize: 10, transform: catDropdownOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", display: "inline-block" }}>▾</span>
+            </button>
+            {catDropdownOpen && (
+              <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 6, overflow: "hidden", zIndex: 20, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", animation: "fadeUp 0.15s ease" }}>
+                {categories.map(c => (
+                  <button key={c} onClick={() => { setCategory(c); setCatDropdownOpen(false); }} style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", fontFamily: T.fontSans, fontSize: 13, color: c === category ? T.text : T.textMuted, fontWeight: c === category ? 500 : 400, background: "none", border: "none", cursor: "pointer", borderBottom: `1px solid ${T.border}` }}>
+                    {c === category && <span style={{ marginRight: 6, fontSize: 10 }}>✓</span>}{c}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div style={{ borderTop: `1px solid ${T.border}` }}>
+            {suppliers.length === 0 && <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textXMuted, padding: "24px 0", textAlign: "center" }}>No suppliers added yet.</p>}
+            {suppliersFiltered.map((s, i) => <SupplierItem key={s.id} supplier={s} index={i} />)}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Resources Section ── */}
+      <div ref={resourcesRef} style={{ borderTop: `8px solid ${T.border}`, background: T.bg }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "48px 20px 80px" }}>
+          <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 8 }}>Resources</h2>
+          <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 32 }}>Access and download documents, forms and guides.</p>
+
+          {resources.length === 0 ? (
+            <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textXMuted, fontStyle: "italic" }}>No resources available yet.</p>
           ) : (
-            filtered.map((faq, i) => <AccordionItem key={faq.id} faq={faq} index={i} />)
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// PREFERRED SUPPLIERS PAGE
-// ═══════════════════════════════════════════════════════════════════════════════
-const INITIAL_SUPPLIERS = [
-  { id: 1, business: "Acme Electrical", contact: "Jane Smith", email: "jane@acmeelec.com.au", phone: "08 9123 4567", mobile: "", category: "Electrical" },
-  { id: 2, business: "Blue Ocean Plumbing", contact: "Tom Carter", email: "tom@blueocean.com.au", phone: "0412 345 678", mobile: "", category: "Plumbing" },
-  { id: 3, business: "Prestige Landscaping", contact: "Sarah Lee", email: "sarah@prestigeland.com.au", phone: "08 9234 5678", mobile: "", category: "Landscaping" },
-];
-
-function SupplierItem({ supplier, index }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div style={{ borderBottom: `1px solid ${T.border}` }}>
-      <button
-        onClick={() => setOpen(!open)}
-        style={{
-          width: "100%", background: "none", border: "none",
-          padding: "18px 0", display: "flex", alignItems: "center",
-          justifyContent: "space-between", gap: 12,
-          cursor: "pointer", textAlign: "left",
-        }}
-      >
-        <span style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <span style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textXMuted, minWidth: 20 }}>
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          <span style={{ fontFamily: T.fontSans, fontSize: 17, color: T.text, fontWeight: 400, lineHeight: 1.3 }}>
-            {supplier.business}
-          </span>
-        </span>
-        <span style={{
-          fontFamily: T.fontMono, fontSize: 16, color: T.textMuted, flexShrink: 0,
-          transform: open ? "rotate(45deg)" : "rotate(0deg)",
-          transition: "transform 0.25s ease", display: "block",
-        }}>+</span>
-      </button>
-      <div style={{ maxHeight: open ? "200px" : 0, overflow: "hidden", transition: "max-height 0.35s cubic-bezier(0.4,0,0.2,1)" }}>
-        <div style={{ paddingBottom: 20, paddingLeft: 34, display: "flex", flexDirection: "column", gap: 8 }}>
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <span style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", minWidth: 64 }}>Contact</span>
-            <span style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted }}>{supplier.contact}</span>
-          </div>
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <span style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", minWidth: 64 }}>Email</span>
-            <a href={`mailto:${supplier.email}`} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, textDecoration: "none", borderBottom: `1px solid ${T.border}` }}>{supplier.email}</a>
-          </div>
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <span style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", minWidth: 64 }}>Phone</span>
-            <button onClick={() => window.open(`tel:${supplier.phone.replace(/\s/g, "")}`, "_self")} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, display: "inline-flex", alignItems: "center", gap: 5, borderBottom: `1px solid ${T.border}`, background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" }}>
-              <span style={{ fontSize: 12 }}>📞</span>{supplier.phone}
-            </button>
-          </div>
-          {supplier.mobile && (
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <span style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", minWidth: 64 }}>Mobile</span>
-            <button onClick={() => window.open(`tel:${supplier.mobile.replace(/\s/g, "")}`, "_self")} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, display: "inline-flex", alignItems: "center", gap: 5, borderBottom: `1px solid ${T.border}`, background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" }}>
-              <span style={{ fontSize: 12 }}>📱</span>{supplier.mobile}
-            </button>
-          </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SuppliersPage({ onGoFAQ, onGoAdmin, onGoResources, suppliers, noHero }) {
-  const [category, setCategory] = useState("All Categories");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  const categories = ["All Categories", ...Array.from(new Set(suppliers.map(s => s.category).filter(Boolean)))];
-  const filtered = category === "All Categories" ? suppliers : suppliers.filter(s => s.category === category);
-
-  return (
-    <div style={{ minHeight: "100vh", background: T.bg, fontFamily: T.fontSans }} onClick={() => setDropdownOpen(false)}>
-      <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }`}</style>
-
-      {/* Hero image — only on first load */}
-      {!noHero && <div style={{
-        width: "100%", height: "100vh", position: "relative", overflow: "hidden",
-        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-      }}>
-        <img src={HERO_SRC} alt="Hero" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(20,16,12,0.75) 0%, rgba(20,16,12,0.55) 50%, rgba(20,16,12,0.85) 100%)" }} />
-        <div style={{ position: "absolute", top: 28, left: 0, right: 0, textAlign: "center" }}>
-          <p style={{ fontFamily: "'Playfair Display', 'Georgia', serif", fontSize: "clamp(0.95rem, 2vw, 1.25rem)", fontWeight: 400, color: "#ffffff", letterSpacing: "0.05em", textShadow: "0 1px 8px rgba(0,0,0,0.4)", margin: 0 }}>Prendiville Group</p>
-        </div>
-        <div style={{ position: "relative", textAlign: "center", padding: "0 24px" }}>
-          <h1 style={{ fontFamily: T.fontSans, fontSize: "clamp(2.5rem, 7vw, 5rem)", fontWeight: 300, color: "#ffffff", letterSpacing: "-1.5px", lineHeight: 1.05, marginBottom: 20 }}>
-            Preferred Suppliers
-          </h1>
-          <p style={{ fontFamily: T.fontSans, fontSize: 16, color: "rgba(255,255,255,0.7)", lineHeight: 1.6, maxWidth: 420, margin: "0 auto" }}>
-            Our trusted network of suppliers and service providers.
-          </p>
-        </div>
-        <div style={{ position: "absolute", bottom: 36, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-          <span style={{ fontFamily: T.fontMono, fontSize: 10, color: "rgba(255,255,255,0.5)", letterSpacing: "0.15em" }}>SCROLL</span>
-          <div style={{ width: 1, height: 40, background: "linear-gradient(to bottom, rgba(255,255,255,0.5), transparent)" }} />
-        </div>
-      </div>}
-
-      {/* Nav */}
-      <div style={{ background: T.bg, padding: "0 20px", borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 10 }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", display: "flex" }}>
-          <button onClick={onGoFAQ} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, background: "none", border: "none", borderBottom: "2px solid transparent", padding: "0 16px", height: 52, cursor: "pointer" }}>FAQs</button>
-          <button style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, fontWeight: 500, background: "none", border: "none", borderBottom: `2px solid ${T.text}`, padding: "0 16px", height: 52, cursor: "pointer" }}>Preferred Suppliers</button>
-          <button onClick={onGoResources} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, background: "none", border: "none", borderBottom: "2px solid transparent", padding: "0 16px", height: 52, cursor: "pointer" }}>Resources</button>
-        </div>
-      </div>
-
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "48px 20px 80px" }}>
-        <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 24 }}>
-          Our trusted network of preferred suppliers and service providers.
-        </p>
-
-        {/* Category dropdown */}
-        <div style={{ position: "relative", marginBottom: 24 }} onClick={e => e.stopPropagation()}>
-          <button
-            onClick={() => setDropdownOpen(o => !o)}
-            style={{
-              display: "flex", alignItems: "center", justifyContent: "space-between",
-              width: "100%", fontFamily: T.fontSans, fontSize: 13, color: T.text,
-              background: "transparent", border: `1px solid ${T.text}`,
-              borderRadius: 6, padding: "10px 12px", cursor: "pointer",
-            }}
-          >
-            <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 12 }}>☰</span>
-              {category}
-            </span>
-            <span style={{ fontSize: 10, transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", display: "inline-block" }}>▾</span>
-          </button>
-          {dropdownOpen && (
-            <div style={{
-              position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0,
-              background: T.bg, border: `1px solid ${T.border}`,
-              borderRadius: 6, overflow: "hidden", zIndex: 20,
-              boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-              animation: "fadeUp 0.15s ease",
-            }}>
-              {categories.map(c => (
-                <button key={c} onClick={() => { setCategory(c); setDropdownOpen(false); }} style={{
-                  display: "block", width: "100%", textAlign: "left",
-                  padding: "10px 14px", fontFamily: T.fontSans, fontSize: 13,
-                  color: c === category ? T.text : T.textMuted,
-                  fontWeight: c === category ? 500 : 400,
-                  background: "none", border: "none", cursor: "pointer",
-                  borderBottom: `1px solid ${T.border}`,
-                }}>
-                  {c === category && <span style={{ marginRight: 6, fontSize: 10 }}>✓</span>}{c}
-                </button>
+            <div style={{ display: "flex", flexDirection: "column", gap: 0, border: `1px solid ${T.border}`, borderRadius: 8, overflow: "hidden", background: T.surface }}>
+              {resources.map((r, i) => (
+                <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 20px", borderBottom: i < resources.length - 1 ? `1px solid ${T.border}` : "none" }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.text, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: 2 }}>{r.name}</p>
+                    <p style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textXMuted, letterSpacing: "0.05em" }}>
+                      {r.category && <span style={{ marginRight: 8 }}>{r.category} ·</span>}
+                      {formatSize(r.size)} · {r.name.split(".").pop().toUpperCase()}
+                    </p>
+                  </div>
+                  <button onClick={() => download(r)} style={{ flexShrink: 0, background: T.text, color: T.bg, border: "none", borderRadius: 4, padding: "7px 14px", fontFamily: T.fontSans, fontSize: 12, fontWeight: 500, cursor: "pointer" }}>↓ Download</button>
+                </div>
               ))}
             </div>
           )}
-        </div>
 
-        <div style={{ borderTop: `1px solid ${T.border}` }}>
-          {filtered.length === 0 ? (
-            <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textXMuted, padding: "24px 0", textAlign: "center" }}>No suppliers in this category.</p>
-          ) : (
-            filtered.map((s, i) => <SupplierItem key={s.id} supplier={s} index={i} />)
-          )}
-        </div>
-
-        {/* Footer */}
-        <div style={{ textAlign: "center", marginTop: 64, paddingTop: 24, borderTop: `1px solid ${T.border}` }}>
-          <button onClick={onGoAdmin} style={{ fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, background: "none", border: `1px solid ${T.border}`, borderRadius: 4, padding: "8px 20px", cursor: "pointer" }}>
-            Admin login
-          </button>
+          {/* Footer admin link */}
+          <div style={{ textAlign: "center", marginTop: 64, paddingTop: 24, borderTop: `1px solid ${T.border}` }}>
+            <button onClick={onGoAdmin} style={{ fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, background: "none", border: `1px solid ${T.border}`, borderRadius: 4, padding: "8px 20px", cursor: "pointer" }}>Admin login</button>
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // ADMIN LOGIN
@@ -565,6 +392,10 @@ function AdminLogin({ onLogin, onBack }) {
   );
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADMIN CMS
 // ═══════════════════════════════════════════════════════════════════════════════
 // ADMIN CMS
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -923,124 +754,7 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, onLogout, onViewSite }) {
 
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// RESOURCES PAGE (public)
-// ═══════════════════════════════════════════════════════════════════════════════
-function ResourcesPage({ resources, onGoFAQ, onGoSuppliers, onGoAdmin, noHero }) {
-  const ICONS = { pdf: "📄", docx: "📄", doc: "📄", xlsx: "📊", xls: "📊" };
 
-  function getExt(name) { return name.split(".").pop().toLowerCase(); }
-  function getIcon(name) { return ICONS[getExt(name)] || "📎"; }
-  function formatSize(bytes) {
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
-  }
-  function download(r) {
-    const a = document.createElement("a");
-    a.href = r.data;
-    a.download = r.name;
-    a.click();
-  }
-
-  const categories = ["All", ...Array.from(new Set(resources.map(r => r.category).filter(Boolean)))];
-  const [cat, setCat] = useState("All");
-  const filtered = cat === "All" ? resources : resources.filter(r => r.category === cat);
-
-  return (
-    <div style={{ minHeight: "100vh", background: T.bg, fontFamily: T.fontSans }}>
-      <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }`}</style>
-
-      {/* Hero — only on first load */}
-      {!noHero && <div style={{ width: "100%", height: "100vh", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-        <img src={HERO_SRC} alt="Hero" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(20,16,12,0.75) 0%, rgba(20,16,12,0.55) 50%, rgba(20,16,12,0.85) 100%)" }} />
-        <div style={{ position: "absolute", top: 28, left: 0, right: 0, textAlign: "center" }}>
-          <p style={{ fontFamily: "'Playfair Display', 'Georgia', serif", fontSize: "clamp(0.95rem, 2vw, 1.25rem)", fontWeight: 400, color: "#ffffff", letterSpacing: "0.05em", textShadow: "0 1px 8px rgba(0,0,0,0.4)", margin: 0 }}>Prendiville Group</p>
-        </div>
-        <div style={{ position: "relative", textAlign: "center", padding: "0 24px" }}>
-          <h1 style={{ fontFamily: T.fontSans, fontSize: "clamp(2.5rem, 7vw, 5rem)", fontWeight: 300, color: "#ffffff", letterSpacing: "-1.5px", lineHeight: 1.05, marginBottom: 20 }}>Resources</h1>
-          <p style={{ fontFamily: T.fontSans, fontSize: 16, color: "rgba(255,255,255,0.7)", lineHeight: 1.6, maxWidth: 420, margin: "0 auto" }}>Download documents, guides and forms.</p>
-        </div>
-        <div style={{ position: "absolute", bottom: 36, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-          <span style={{ fontFamily: T.fontMono, fontSize: 10, color: "rgba(255,255,255,0.5)", letterSpacing: "0.15em" }}>SCROLL</span>
-          <div style={{ width: 1, height: 40, background: "linear-gradient(to bottom, rgba(255,255,255,0.5), transparent)" }} />
-        </div>
-      </div>}
-
-      {/* Nav */}
-      <div style={{ background: T.bg, padding: "0 20px", borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 10 }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", display: "flex" }}>
-          <button onClick={onGoFAQ} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, background: "none", border: "none", borderBottom: "2px solid transparent", padding: "0 16px", height: 52, cursor: "pointer" }}>FAQs</button>
-          <button onClick={onGoSuppliers} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, background: "none", border: "none", borderBottom: "2px solid transparent", padding: "0 16px", height: 52, cursor: "pointer" }}>Preferred Suppliers</button>
-          <button style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, fontWeight: 500, background: "none", border: "none", borderBottom: `2px solid ${T.text}`, padding: "0 16px", height: 52, cursor: "pointer" }}>Resources</button>
-        </div>
-      </div>
-
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "48px 20px 80px" }}>
-        <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 32 }}>
-          Access and download documents, forms and guides shared by the Prendiville Group team.
-        </p>
-
-        {/* Category filter */}
-        {categories.length > 1 && (
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 24 }}>
-            {categories.map(c => (
-              <button key={c} onClick={() => setCat(c)} style={{
-                fontFamily: T.fontSans, fontSize: 13, padding: "6px 14px",
-                borderRadius: 20, border: `1px solid ${cat === c ? T.text : T.border}`,
-                background: cat === c ? T.text : "transparent",
-                color: cat === c ? T.bg : T.textMuted,
-                cursor: "pointer", transition: "all 0.15s",
-              }}>{c}</button>
-            ))}
-          </div>
-        )}
-
-        {/* File list */}
-        {filtered.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "48px 0" }}>
-            <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textXMuted, fontStyle: "italic" }}>No resources available yet.</p>
-          </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 0, border: `1px solid ${T.border}`, borderRadius: 8, overflow: "hidden", background: T.surface }}>
-            {filtered.map((r, i) => (
-              <div key={r.id} style={{
-                display: "flex", alignItems: "center", gap: 14, padding: "16px 20px",
-                borderBottom: i < filtered.length - 1 ? `1px solid ${T.border}` : "none",
-                animation: "fadeUp 0.3s ease",
-              }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.text, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: 2 }}>{r.name}</p>
-                  <p style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textXMuted, letterSpacing: "0.05em" }}>
-                    {r.category && <span style={{ marginRight: 8 }}>{r.category} ·</span>}
-                    {formatSize(r.size)} · {getExt(r.name).toUpperCase()}
-                  </p>
-                </div>
-                <button onClick={() => download(r)} style={{
-                  flexShrink: 0, background: T.text, color: T.bg,
-                  border: "none", borderRadius: 4, padding: "7px 14px",
-                  fontFamily: T.fontSans, fontSize: 12, fontWeight: 500, cursor: "pointer",
-                  display: "flex", alignItems: "center", gap: 5,
-                }}>
-                  ↓ Download
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Footer */}
-        <div style={{ textAlign: "center", marginTop: 64, paddingTop: 24, borderTop: `1px solid ${T.border}` }}>
-          <button onClick={onGoAdmin} style={{ fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, background: "none", border: `1px solid ${T.border}`, borderRadius: 4, padding: "8px 20px", cursor: "pointer" }}>
-            Admin login
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
 // APP ROUTER
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function App() {
@@ -1049,8 +763,6 @@ export default function App() {
   const [suppliers, setSuppliers] = useState([]);
   const [resources, setResources] = useState([]);
   const [view, setView] = useState("public");
-  const [noHero, setNoHero] = useState(false);
-  const [showContent, setShowContent] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Load all data from Supabase on mount
@@ -1125,10 +837,7 @@ export default function App() {
 
   return (
     <>
-      {view === "public" && <PublicPage faqs={faqs} showContent={showContent} setShowContent={setShowContent} onGoAdmin={() => setView("login")} onGoFAQs={() => setView("faqs")} onGoSuppliers={() => setView("suppliers")} onGoResources={() => setView("resources")} />}
-      {view === "faqs" && <PublicPage faqs={faqs} showContent={true} setShowContent={() => {}} onGoAdmin={() => setView("login")} onGoFAQs={() => setView("faqs")} onGoSuppliers={() => setView("suppliers")} onGoResources={() => setView("resources")} onGoHome={() => setView("public")} />}
-      {view === "suppliers" && <SuppliersPage noHero={true} suppliers={suppliers} onGoFAQ={() => setView("faqs")} onGoSuppliers={() => setView("suppliers")} onGoResources={() => setView("resources")} onGoAdmin={() => setView("login")} />}
-      {view === "resources" && <ResourcesPage noHero={true} resources={resources} onGoFAQ={() => setView("faqs")} onGoSuppliers={() => setView("suppliers")} onGoAdmin={() => setView("login")} />}
+      {view === "public" && <PublicSite faqs={faqs} suppliers={suppliers} resources={resources} onGoAdmin={() => setView("login")} />}
       {view === "login" && <AdminLogin onLogin={() => setView("admin")} onBack={() => setView("public")} />}
       {view === "admin" && <AdminCMS faqs={faqs} suppliers={suppliers} resources={resources} dbOps={dbOps} onLogout={() => setView("public")} onViewSite={() => setView("public")} />}
     </>
