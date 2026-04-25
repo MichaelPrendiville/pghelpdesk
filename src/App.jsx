@@ -182,7 +182,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin }) {
         <img src={HERO_SRC} alt="Hero" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(20,16,12,0.75) 0%, rgba(20,16,12,0.55) 50%, rgba(20,16,12,0.85) 100%)" }} />
         <div style={{ position: "absolute", top: 28, left: 0, right: 0, textAlign: "center" }}>
-          <p style={{ fontFamily: "\'Playfair Display\', \'Georgia\', serif", fontSize: "clamp(0.95rem, 2vw, 1.25rem)", fontWeight: 400, color: "#ffffff", letterSpacing: "0.05em", textShadow: "0 1px 8px rgba(0,0,0,0.4)", margin: 0 }}>Prendiville Group</p>
+          <p style={{ fontFamily: "'Playfair Display', 'Georgia', serif", fontSize: "clamp(0.95rem, 2vw, 1.25rem)", fontWeight: 400, color: "#ffffff", letterSpacing: "0.05em", textShadow: "0 1px 8px rgba(0,0,0,0.4)", margin: 0 }}>Prendiville Group</p>
         </div>
         <div style={{ position: "relative", textAlign: "center", padding: "0 24px" }}>
           <p style={{ fontFamily: T.fontMono, fontSize: 11, color: "rgba(255,255,255,0.6)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 16 }}>PG Create</p>
