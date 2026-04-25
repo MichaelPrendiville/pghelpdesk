@@ -105,10 +105,26 @@ function AccordionItem({ faq, index }) {
           transition: "transform 0.25s ease", display: "block",
         }}>+</span>
       </button>
-      <div style={{ maxHeight: open ? "300px" : 0, overflow: "hidden", transition: "max-height 0.35s cubic-bezier(0.4,0,0.2,1)" }}>
-        <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.7, paddingBottom: 18, paddingLeft: 34, margin: 0 }}>
-          {faq.answer}
-        </p>
+      <div style={{ maxHeight: open ? "600px" : 0, overflow: "hidden", transition: "max-height 0.5s cubic-bezier(0.4,0,0.2,1)" }}>
+        <div style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.7, paddingBottom: 18, paddingLeft: 34, margin: 0 }}>
+          {(() => {
+            const lines = faq.answer.split(/\n|(?=\s*[–—-]\s)/);
+            const bullets = lines.map(l => l.trim()).filter(l => l.match(/^[–—-]\s/));
+            if (bullets.length > 1) {
+              const parts = faq.answer.split(/\n/).map(l => l.trim()).filter(Boolean);
+              return (
+                <ul style={{ paddingLeft: 18, margin: 0 }}>
+                  {parts.map((part, i) => (
+                    <li key={i} style={{ marginBottom: 6, listStyleType: "disc" }}>
+                      {part.replace(/^[–—-]\s*/, "")}
+                    </li>
+                  ))}
+                </ul>
+              );
+            }
+            return <p style={{ margin: 0 }}>{faq.answer}</p>;
+          })()}
+        </div>
       </div>
     </div>
   );
@@ -117,11 +133,10 @@ function AccordionItem({ faq, index }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // PUBLIC PAGE
 // ═══════════════════════════════════════════════════════════════════════════════
-function PublicPage({ faqs, onGoAdmin, onGoSuppliers, onGoResources }) {
+function PublicPage({ faqs, onGoAdmin, onGoSuppliers, onGoResources, showContent, setShowContent }) {
   const [query, setQuery] = useState("");
   const [topic, setTopic] = useState("All Topics");
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [showContent, setShowContent] = useState(false);
 
   const topics = ["All Topics", ...Array.from(new Set(faqs.map(f => f.topic).filter(Boolean)))];
 
@@ -1035,6 +1050,7 @@ export default function App() {
   const [resources, setResources] = useState([]);
   const [view, setView] = useState("public");
   const [noHero, setNoHero] = useState(false);
+  const [showContent, setShowContent] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Load all data from Supabase on mount
@@ -1109,9 +1125,9 @@ export default function App() {
 
   return (
     <>
-      {view === "public" && <PublicPage faqs={faqs} onGoAdmin={() => setView("login")} onGoSuppliers={() => { setNoHero(true); setView("suppliers"); }} onGoResources={() => { setNoHero(true); setView("resources"); }} />}
-      {view === "suppliers" && <SuppliersPage noHero={noHero} suppliers={suppliers} onGoFAQ={() => { setNoHero(true); setView("public"); }} onGoSuppliers={() => setView("suppliers")} onGoResources={() => setView("resources")} onGoAdmin={() => setView("login")} />}
-      {view === "resources" && <ResourcesPage noHero={noHero} resources={resources} onGoFAQ={() => { setNoHero(true); setView("public"); }} onGoSuppliers={() => setView("suppliers")} onGoAdmin={() => setView("login")} />}
+      {view === "public" && <PublicPage faqs={faqs} showContent={showContent} setShowContent={setShowContent} onGoAdmin={() => setView("login")} onGoSuppliers={() => { setNoHero(true); setView("suppliers"); }} onGoResources={() => { setNoHero(true); setView("resources"); }} />}
+      {view === "suppliers" && <SuppliersPage noHero={noHero} suppliers={suppliers} onGoFAQ={() => { setNoHero(true); setShowContent(true); setView("public"); }} onGoSuppliers={() => setView("suppliers")} onGoResources={() => setView("resources")} onGoAdmin={() => setView("login")} />}
+      {view === "resources" && <ResourcesPage noHero={noHero} resources={resources} onGoFAQ={() => { setNoHero(true); setShowContent(true); setView("public"); }} onGoSuppliers={() => setView("suppliers")} onGoAdmin={() => setView("login")} />}
       {view === "login" && <AdminLogin onLogin={() => setView("admin")} onBack={() => setView("public")} />}
       {view === "admin" && <AdminCMS faqs={faqs} suppliers={suppliers} resources={resources} dbOps={dbOps} onLogout={() => setView("public")} onViewSite={() => setView("public")} />}
     </>
