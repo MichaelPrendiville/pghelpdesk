@@ -256,7 +256,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin }) {
 
       {/* ── Sticky tab bar ── */}
       <div style={{ background: T.bg, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 10 }}>
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", display: "flex" }}>
           {[{ label: "FAQs", tab: "faqs", ref: faqRef }, { label: "Preferred Suppliers", tab: "suppliers", ref: suppliersRef }, { label: "Resources", tab: "resources", ref: resourcesRef }].map(t => (
             <button key={t.tab} onClick={() => scrollTo(t.ref, t.tab)} style={{ flex: 1, fontFamily: T.fontSans, fontSize: 14, color: activeTab === t.tab ? T.text : T.textMuted, fontWeight: activeTab === t.tab ? 500 : 400, background: "none", border: "none", borderBottom: activeTab === t.tab ? `2px solid ${T.text}` : "2px solid transparent", padding: "0 8px", height: 52, cursor: "pointer", transition: "all 0.15s" }}>
               {t.label}
