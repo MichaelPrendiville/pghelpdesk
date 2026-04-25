@@ -133,7 +133,7 @@ function AccordionItem({ faq, index }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // PUBLIC PAGE
 // ═══════════════════════════════════════════════════════════════════════════════
-function PublicPage({ faqs, onGoAdmin, onGoSuppliers, onGoResources, showContent, setShowContent }) {
+function PublicPage({ faqs, onGoAdmin, onGoFAQs, onGoSuppliers, onGoResources, showContent, setShowContent, onGoHome }) {
   const [query, setQuery] = useState("");
   const [topic, setTopic] = useState("All Topics");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -173,7 +173,7 @@ function PublicPage({ faqs, onGoAdmin, onGoSuppliers, onGoResources, showContent
             {/* Nav buttons */}
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
               {[
-                { label: "FAQs", action: () => setShowContent(true) },
+                { label: "FAQs", action: onGoFAQs },
                 { label: "Preferred Suppliers", action: onGoSuppliers },
                 { label: "Resources", action: onGoResources },
               ].map(btn => (
@@ -219,7 +219,7 @@ function PublicPage({ faqs, onGoAdmin, onGoSuppliers, onGoResources, showContent
             <button onClick={onGoSuppliers} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, background: "none", border: "none", borderBottom: "2px solid transparent", padding: "0 16px", height: 52, cursor: "pointer" }}>Preferred Suppliers</button>
             <button onClick={onGoResources} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, background: "none", border: "none", borderBottom: "2px solid transparent", padding: "0 16px", height: 52, cursor: "pointer" }}>Resources</button>
           </div>
-          <button onClick={() => setShowContent(false)} style={{ fontFamily: T.fontSans, fontSize: 12, color: T.textXMuted, background: "none", border: "none", cursor: "pointer", letterSpacing: "0.05em" }}>← Home</button>
+          <button onClick={() => { if (typeof onGoHome === "function") onGoHome(); else setShowContent(false); }} style={{ fontFamily: T.fontSans, fontSize: 12, color: T.textXMuted, background: "none", border: "none", cursor: "pointer", letterSpacing: "0.05em" }}>← Home</button>
         </div>
       </div>
 
@@ -1125,9 +1125,10 @@ export default function App() {
 
   return (
     <>
-      {view === "public" && <PublicPage faqs={faqs} showContent={showContent} setShowContent={setShowContent} onGoAdmin={() => setView("login")} onGoSuppliers={() => { setNoHero(true); setView("suppliers"); }} onGoResources={() => { setNoHero(true); setView("resources"); }} />}
-      {view === "suppliers" && <SuppliersPage noHero={noHero} suppliers={suppliers} onGoFAQ={() => { setNoHero(true); setShowContent(true); setView("public"); }} onGoSuppliers={() => setView("suppliers")} onGoResources={() => setView("resources")} onGoAdmin={() => setView("login")} />}
-      {view === "resources" && <ResourcesPage noHero={noHero} resources={resources} onGoFAQ={() => { setNoHero(true); setShowContent(true); setView("public"); }} onGoSuppliers={() => setView("suppliers")} onGoAdmin={() => setView("login")} />}
+      {view === "public" && <PublicPage faqs={faqs} showContent={showContent} setShowContent={setShowContent} onGoAdmin={() => setView("login")} onGoFAQs={() => setView("faqs")} onGoSuppliers={() => setView("suppliers")} onGoResources={() => setView("resources")} />}
+      {view === "faqs" && <PublicPage faqs={faqs} showContent={true} setShowContent={() => {}} onGoAdmin={() => setView("login")} onGoFAQs={() => setView("faqs")} onGoSuppliers={() => setView("suppliers")} onGoResources={() => setView("resources")} onGoHome={() => setView("public")} />}
+      {view === "suppliers" && <SuppliersPage noHero={true} suppliers={suppliers} onGoFAQ={() => setView("faqs")} onGoSuppliers={() => setView("suppliers")} onGoResources={() => setView("resources")} onGoAdmin={() => setView("login")} />}
+      {view === "resources" && <ResourcesPage noHero={true} resources={resources} onGoFAQ={() => setView("faqs")} onGoSuppliers={() => setView("suppliers")} onGoAdmin={() => setView("login")} />}
       {view === "login" && <AdminLogin onLogin={() => setView("admin")} onBack={() => setView("public")} />}
       {view === "admin" && <AdminCMS faqs={faqs} suppliers={suppliers} resources={resources} dbOps={dbOps} onLogout={() => setView("public")} onViewSite={() => setView("public")} />}
     </>
