@@ -131,6 +131,56 @@ function AccordionItem({ faq, index }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// SUPPLIER ITEM ACCORDION
+// ═══════════════════════════════════════════════════════════════════════════════
+function SupplierItem({ supplier, index }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ borderBottom: `1px solid ${T.border}` }}>
+      <button onClick={() => setOpen(!open)} style={{ width: "100%", background: "none", border: "none", padding: "18px 0", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, cursor: "pointer", textAlign: "left" }}>
+        <span style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <span style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textXMuted, minWidth: 20 }}>{String(index + 1).padStart(2, "0")}</span>
+          <span style={{ fontFamily: T.fontSans, fontSize: 17, color: T.text, fontWeight: 400, lineHeight: 1.3 }}>{supplier.business}</span>
+        </span>
+        <span style={{ fontFamily: T.fontMono, fontSize: 16, color: T.textMuted, flexShrink: 0, transform: open ? "rotate(45deg)" : "rotate(0deg)", transition: "transform 0.25s ease", display: "block" }}>+</span>
+      </button>
+      <div style={{ maxHeight: open ? "300px" : 0, overflow: "hidden", transition: "max-height 0.35s cubic-bezier(0.4,0,0.2,1)" }}>
+        <div style={{ paddingBottom: 20, paddingLeft: 34, display: "flex", flexDirection: "column", gap: 8 }}>
+          {supplier.contact && (
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <span style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", minWidth: 64 }}>Contact</span>
+              <span style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted }}>{supplier.contact}</span>
+            </div>
+          )}
+          {supplier.email && (
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <span style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", minWidth: 64 }}>Email</span>
+              <a href={`mailto:${supplier.email}`} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, textDecoration: "none", borderBottom: `1px solid ${T.border}` }}>{supplier.email}</a>
+            </div>
+          )}
+          {supplier.phone && (
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <span style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", minWidth: 64 }}>Phone</span>
+              <button onClick={() => window.open(`tel:${supplier.phone.replace(/\s/g, "")}`, "_self")} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, display: "inline-flex", alignItems: "center", gap: 5, borderBottom: `1px solid ${T.border}`, background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" }}>
+                <span style={{ fontSize: 12 }}>📞</span>{supplier.phone}
+              </button>
+            </div>
+          )}
+          {supplier.mobile && (
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <span style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", minWidth: 64 }}>Mobile</span>
+              <button onClick={() => window.open(`tel:${supplier.mobile.replace(/\s/g, "")}`, "_self")} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, display: "inline-flex", alignItems: "center", gap: 5, borderBottom: `1px solid ${T.border}`, background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" }}>
+                <span style={{ fontSize: 12 }}>📱</span>{supplier.mobile}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // PUBLIC SITE (single scrolling page)
 // ═══════════════════════════════════════════════════════════════════════════════
 function PublicSite({ faqs, suppliers, resources, onGoAdmin }) {
