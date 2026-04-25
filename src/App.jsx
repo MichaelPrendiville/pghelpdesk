@@ -1,5 +1,26 @@
 import { useState, useEffect } from "react";
 
+// ── Supabase client ──────────────────────────────────────────────────────────
+const SUPABASE_URL = "https://vvvnmqbnjtnakjfwflgy.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2dm5tcWJuanRuYWtqZndmbGd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMDAzNTQsImV4cCI6MjA5MjY3NjM1NH0.8IaOjdNr34UqL_sz3RFjSP6aOfzxcVZ1VHrU3H079B4";
+
+async function sbFetch(table, options = {}) {
+  const { method = "GET", body, query = "" } = options;
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${query}`, {
+    method,
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json",
+      "Prefer": method === "POST" ? "return=representation" : "",
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) return null;
+  if (method === "DELETE" || res.status === 204) return true;
+  return res.json();
+}
+
 const INITIAL_FAQS = [
   { id: 1, question: "What is your return policy?", answer: "We offer a 30-day no-questions-asked return policy on all items. Simply contact our support team and we'll arrange a free pickup." },
   { id: 2, question: "How long does shipping take?", answer: "Standard shipping takes 3–5 business days. Express shipping (1–2 days) is available at checkout for an additional fee." },
@@ -100,6 +121,7 @@ function PublicPage({ faqs, onGoAdmin, onGoSuppliers, onGoResources }) {
   const [query, setQuery] = useState("");
   const [topic, setTopic] = useState("All Topics");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showContent, setShowContent] = useState(false);
 
   const topics = ["All Topics", ...Array.from(new Set(faqs.map(f => f.topic).filter(Boolean)))];
 
@@ -109,89 +131,86 @@ function PublicPage({ faqs, onGoAdmin, onGoSuppliers, onGoResources }) {
     return matchesQuery && matchesTopic;
   });
 
+  // ── LANDING (hero) view ──────────────────────────────────────────
+  if (!showContent) {
+    return (
+      <div style={{ minHeight: "100vh", fontFamily: T.fontSans }}>
+        <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }`}</style>
+        <div style={{ width: "100%", height: "100vh", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          <img src={HERO_SRC} alt="Hero" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(20,16,12,0.75) 0%, rgba(20,16,12,0.55) 50%, rgba(20,16,12,0.85) 100%)" }} />
+
+          {/* Logo */}
+          <div style={{ position: "absolute", top: 28, left: 0, right: 0, textAlign: "center" }}>
+            <p style={{ fontFamily: "'Playfair Display', 'Georgia', serif", fontSize: "clamp(0.95rem, 2vw, 1.25rem)", fontWeight: 400, color: "#ffffff", letterSpacing: "0.05em", textShadow: "0 1px 8px rgba(0,0,0,0.4)", margin: 0 }}>Prendiville Group</p>
+          </div>
+
+          {/* Hero text + nav buttons */}
+          <div style={{ position: "relative", textAlign: "center", padding: "0 24px" }}>
+            <p style={{ fontFamily: T.fontMono, fontSize: 11, color: "rgba(255,255,255,0.6)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 16 }}>PG Create</p>
+            <h1 style={{ fontFamily: T.fontSans, fontSize: "clamp(2.5rem, 7vw, 5rem)", fontWeight: 300, color: "#ffffff", letterSpacing: "-1.5px", lineHeight: 1.05, marginBottom: 20 }}>
+              How can we help?
+            </h1>
+            <p style={{ fontFamily: T.fontSans, fontSize: 16, color: "rgba(255,255,255,0.7)", lineHeight: 1.6, maxWidth: 420, margin: "0 auto 40px" }}>
+              Browse answers to common questions below.
+            </p>
+
+            {/* Nav buttons */}
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              {[
+                { label: "FAQs", action: () => setShowContent(true) },
+                { label: "Preferred Suppliers", action: onGoSuppliers },
+                { label: "Resources", action: onGoResources },
+              ].map(btn => (
+                <button key={btn.label} onClick={btn.action} style={{
+                  fontFamily: T.fontSans, fontSize: 14, fontWeight: 500,
+                  color: "#ffffff", background: "rgba(255,255,255,0.12)",
+                  border: "1.5px solid rgba(255,255,255,0.5)",
+                  borderRadius: 6, padding: "12px 28px",
+                  cursor: "pointer", letterSpacing: "0.02em",
+                  backdropFilter: "blur(8px)",
+                  transition: "background 0.2s, border-color 0.2s",
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.25)"; e.currentTarget.style.borderColor = "#ffffff"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.12)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.5)"; }}
+                >
+                  {btn.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Admin link */}
+          <div style={{ position: "absolute", bottom: 28, left: 0, right: 0, textAlign: "center" }}>
+            <button onClick={onGoAdmin} style={{ fontFamily: T.fontSans, fontSize: 12, color: "rgba(255,255,255,0.35)", background: "none", border: "none", cursor: "pointer", letterSpacing: "0.05em" }}>
+              Admin login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── CONTENT view (no hero) ───────────────────────────────────────
   return (
     <div style={{ minHeight: "100vh", background: T.bg, fontFamily: T.fontSans }} onClick={() => setDropdownOpen(false)}>
       <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} } input::placeholder { color: #aaa89f; } select { appearance: none; }`}</style>
 
-      {/* Hero image */}
-      <div style={{
-        width: "100%",
-        height: "100vh",
-        position: "relative",
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-      }}>
-        <img
-          src={HERO_SRC}
-          alt="Hero"
-          style={{
-            position: "absolute", inset: 0,
-            width: "100%", height: "100%",
-            objectFit: "cover", objectPosition: "center",
-          }}
-        />
-        {/* Overlay */}
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(to bottom, rgba(20,16,12,0.75) 0%, rgba(20,16,12,0.55) 50%, rgba(20,16,12,0.85) 100%)",
-        }} />
-        {/* Logo — pinned to top */}
-        <div style={{ position: "absolute", top: 28, left: 0, right: 0, textAlign: "center" }}>
-          <p style={{
-            fontFamily: "'Playfair Display', 'Georgia', serif",
-            fontSize: "clamp(0.95rem, 2vw, 1.25rem)",
-            fontWeight: 400,
-            color: "#ffffff",
-            letterSpacing: "0.05em",
-            textShadow: "0 1px 8px rgba(0,0,0,0.4)",
-            margin: 0,
-          }}>Prendiville Group</p>
-        </div>
-
-        {/* Hero text */}
-        <div style={{ position: "relative", textAlign: "center", padding: "0 24px" }}>
-          <p style={{ fontFamily: T.fontMono, fontSize: 11, color: "rgba(255,255,255,0.6)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 16 }}>
-            PGHELPDESK
-          </p>
-          <h1 style={{
-            fontFamily: T.fontSans, fontSize: "clamp(2.5rem, 7vw, 5rem)",
-            fontWeight: 300, color: "#ffffff", letterSpacing: "-1.5px",
-            lineHeight: 1.05, marginBottom: 20,
-          }}>
-            How can we help?
-          </h1>
-          <p style={{ fontFamily: T.fontSans, fontSize: 16, color: "rgba(255,255,255,0.7)", lineHeight: 1.6, maxWidth: 420, margin: "0 auto" }}>
-            Browse answers to common questions below.
-          </p>
-        </div>
-        {/* Scroll cue */}
-        <div style={{
-          position: "absolute", bottom: 36,
-          display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
-        }}>
-          <span style={{ fontFamily: T.fontMono, fontSize: 10, color: "rgba(255,255,255,0.5)", letterSpacing: "0.15em" }}>SCROLL</span>
-          <div style={{
-            width: 1, height: 40,
-            background: "linear-gradient(to bottom, rgba(255,255,255,0.5), transparent)",
-          }} />
-        </div>
-      </div>
-
       {/* Nav tabs */}
       <div style={{ background: T.bg, padding: "0 20px", borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 10 }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", display: "flex" }}>
-          <button style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, fontWeight: 500, background: "none", border: "none", borderBottom: `2px solid ${T.text}`, padding: "0 16px", height: 52, cursor: "pointer" }}>FAQs</button>
-          <button onClick={onGoSuppliers} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, background: "none", border: "none", borderBottom: "2px solid transparent", padding: "0 16px", height: 52, cursor: "pointer" }}>Preferred Suppliers</button>
-          <button onClick={onGoResources} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, background: "none", border: "none", borderBottom: "2px solid transparent", padding: "0 16px", height: 52, cursor: "pointer" }}>Resources</button>
+        <div style={{ maxWidth: 680, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex" }}>
+            <button style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, fontWeight: 500, background: "none", border: "none", borderBottom: `2px solid ${T.text}`, padding: "0 16px", height: 52, cursor: "pointer" }}>FAQs</button>
+            <button onClick={onGoSuppliers} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, background: "none", border: "none", borderBottom: "2px solid transparent", padding: "0 16px", height: 52, cursor: "pointer" }}>Preferred Suppliers</button>
+            <button onClick={onGoResources} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, background: "none", border: "none", borderBottom: "2px solid transparent", padding: "0 16px", height: 52, cursor: "pointer" }}>Resources</button>
+          </div>
+          <button onClick={() => setShowContent(false)} style={{ fontFamily: T.fontSans, fontSize: 12, color: T.textXMuted, background: "none", border: "none", cursor: "pointer", letterSpacing: "0.05em" }}>← Home</button>
         </div>
       </div>
 
       {/* Page content */}
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "32px 20px 80px" }}>
-        <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 48, marginTop: 48, maxWidth: 480 }}>
+        <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 24, marginTop: 24, maxWidth: 480 }}>
           Browse answers to common questions. Can't find what you're looking for? Get in touch with our support team.
         </p>
 
@@ -287,17 +306,6 @@ function PublicPage({ faqs, onGoAdmin, onGoSuppliers, onGoResources }) {
             filtered.map((faq, i) => <AccordionItem key={faq.id} faq={faq} index={i} />)
           )}
         </div>
-
-        {/* Footer */}
-        <div style={{ textAlign: "center", marginTop: 48, paddingTop: 24, borderTop: `1px solid ${T.border}` }}>
-          <button onClick={onGoAdmin} style={{
-            fontFamily: T.fontSans, fontSize: 13, color: T.textMuted,
-            background: "none", border: `1px solid ${T.border}`, borderRadius: 4,
-            padding: "8px 20px", cursor: "pointer", letterSpacing: "0.02em",
-          }}>
-            Admin login
-          </button>
-        </div>
       </div>
     </div>
   );
@@ -307,9 +315,9 @@ function PublicPage({ faqs, onGoAdmin, onGoSuppliers, onGoResources }) {
 // PREFERRED SUPPLIERS PAGE
 // ═══════════════════════════════════════════════════════════════════════════════
 const INITIAL_SUPPLIERS = [
-  { id: 1, business: "Acme Electrical", contact: "Jane Smith", email: "jane@acmeelec.com.au", phone: "08 9123 4567", category: "Electrical" },
-  { id: 2, business: "Blue Ocean Plumbing", contact: "Tom Carter", email: "tom@blueocean.com.au", phone: "0412 345 678", category: "Plumbing" },
-  { id: 3, business: "Prestige Landscaping", contact: "Sarah Lee", email: "sarah@prestigeland.com.au", phone: "08 9234 5678", category: "Landscaping" },
+  { id: 1, business: "Acme Electrical", contact: "Jane Smith", email: "jane@acmeelec.com.au", phone: "08 9123 4567", mobile: "", category: "Electrical" },
+  { id: 2, business: "Blue Ocean Plumbing", contact: "Tom Carter", email: "tom@blueocean.com.au", phone: "0412 345 678", mobile: "", category: "Plumbing" },
+  { id: 3, business: "Prestige Landscaping", contact: "Sarah Lee", email: "sarah@prestigeland.com.au", phone: "08 9234 5678", mobile: "", category: "Landscaping" },
 ];
 
 function SupplierItem({ supplier, index }) {
@@ -355,13 +363,21 @@ function SupplierItem({ supplier, index }) {
               <span style={{ fontSize: 12 }}>📞</span>{supplier.phone}
             </button>
           </div>
+          {supplier.mobile && (
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <span style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", minWidth: 64 }}>Mobile</span>
+            <button onClick={() => window.open(`tel:${supplier.mobile.replace(/\s/g, "")}`, "_self")} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, display: "inline-flex", alignItems: "center", gap: 5, borderBottom: `1px solid ${T.border}`, background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" }}>
+              <span style={{ fontSize: 12 }}>📱</span>{supplier.mobile}
+            </button>
+          </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function SuppliersPage({ onGoFAQ, onGoAdmin, onGoResources, suppliers }) {
+function SuppliersPage({ onGoFAQ, onGoAdmin, onGoResources, suppliers, noHero }) {
   const [category, setCategory] = useState("All Categories");
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -372,18 +388,16 @@ function SuppliersPage({ onGoFAQ, onGoAdmin, onGoResources, suppliers }) {
     <div style={{ minHeight: "100vh", background: T.bg, fontFamily: T.fontSans }} onClick={() => setDropdownOpen(false)}>
       <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }`}</style>
 
-      {/* Hero image */}
-      <div style={{
+      {/* Hero image — only on first load */}
+      {!noHero && <div style={{
         width: "100%", height: "100vh", position: "relative", overflow: "hidden",
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
       }}>
         <img src={HERO_SRC} alt="Hero" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(20,16,12,0.75) 0%, rgba(20,16,12,0.55) 50%, rgba(20,16,12,0.85) 100%)" }} />
-        {/* Logo */}
         <div style={{ position: "absolute", top: 28, left: 0, right: 0, textAlign: "center" }}>
           <p style={{ fontFamily: "'Playfair Display', 'Georgia', serif", fontSize: "clamp(0.95rem, 2vw, 1.25rem)", fontWeight: 400, color: "#ffffff", letterSpacing: "0.05em", textShadow: "0 1px 8px rgba(0,0,0,0.4)", margin: 0 }}>Prendiville Group</p>
         </div>
-        {/* Hero text */}
         <div style={{ position: "relative", textAlign: "center", padding: "0 24px" }}>
           <h1 style={{ fontFamily: T.fontSans, fontSize: "clamp(2.5rem, 7vw, 5rem)", fontWeight: 300, color: "#ffffff", letterSpacing: "-1.5px", lineHeight: 1.05, marginBottom: 20 }}>
             Preferred Suppliers
@@ -392,12 +406,11 @@ function SuppliersPage({ onGoFAQ, onGoAdmin, onGoResources, suppliers }) {
             Our trusted network of suppliers and service providers.
           </p>
         </div>
-        {/* Scroll cue */}
         <div style={{ position: "absolute", bottom: 36, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
           <span style={{ fontFamily: T.fontMono, fontSize: 10, color: "rgba(255,255,255,0.5)", letterSpacing: "0.15em" }}>SCROLL</span>
           <div style={{ width: 1, height: 40, background: "linear-gradient(to bottom, rgba(255,255,255,0.5), transparent)" }} />
         </div>
-      </div>
+      </div>}
 
       {/* Nav */}
       <div style={{ background: T.bg, padding: "0 20px", borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 10 }}>
@@ -490,7 +503,7 @@ function AdminLogin({ onLogin, onBack }) {
       <style>{`* { box-sizing: border-box; margin: 0; padding: 0; }`}</style>
       <div style={{ width: "100%", maxWidth: 360 }}>
         {/* Brand */}
-        <p style={{ fontFamily: T.fontSans, fontSize: 22, fontWeight: 600, color: T.text, marginBottom: 32, letterSpacing: "-0.3px" }}>PGHELPDESK</p>
+        <p style={{ fontFamily: T.fontSans, fontSize: 22, fontWeight: 600, color: T.text, marginBottom: 32, letterSpacing: "-0.3px" }}>PG Create</p>
 
         <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, padding: 28 }}>
           <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>RESTRICTED</p>
@@ -540,7 +553,8 @@ function AdminLogin({ onLogin, onBack }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // ADMIN CMS
 // ═══════════════════════════════════════════════════════════════════════════════
-function AdminCMS({ faqs, setFaqs, suppliers, setSuppliers, resources, setResources, onLogout, onViewSite }) {
+function AdminCMS({ faqs, suppliers, resources, dbOps, onLogout, onViewSite }) {
+  const { addFaq, updateFaq, deleteFaq: dbDeleteFaq, reorderFaqs, addSupplier, updateSupplier, deleteSupplier: dbDeleteSupplier, addResource, updateResource, deleteResource } = dbOps;
   const [activeTab, setActiveTab] = useState("faqs");
 
   // FAQ state
@@ -555,10 +569,10 @@ function AdminCMS({ faqs, setFaqs, suppliers, setSuppliers, resources, setResour
 
   // Supplier state
   const [editingSupplier, setEditingSupplier] = useState(null);
-  const [supplierForm, setSupplierForm] = useState({ business: "", contact: "", email: "", phone: "", category: "" });
+  const [supplierForm, setSupplierForm] = useState({ business: "", contact: "", email: "", phone: "", mobile: "", category: "" });
   const [supplierQuery, setSupplierQuery] = useState("");
   const filteredSuppliers = supplierQuery
-    ? suppliers.filter(s => s.business.toLowerCase().includes(supplierQuery.toLowerCase()) || s.category.toLowerCase().includes(supplierQuery.toLowerCase()))
+    ? suppliers.filter(s => s.business.toLowerCase().includes(supplierQuery.toLowerCase()) || (s.category || "").toLowerCase().includes(supplierQuery.toLowerCase()))
     : suppliers;
 
   const [toast, setToast] = useState(null);
@@ -568,32 +582,32 @@ function AdminCMS({ faqs, setFaqs, suppliers, setSuppliers, resources, setResour
   function startEdit(faq) { setEditing(faq.id); setForm({ question: faq.question, answer: faq.answer }); }
   function startNew() { setEditing("new"); setForm({ question: "", answer: "" }); }
   function cancelEdit() { setEditing(null); setForm({ question: "", answer: "" }); }
-  function saveEdit() {
+  async function saveEdit() {
     if (!form.question.trim() || !form.answer.trim()) return;
-    if (editing === "new") { setFaqs(p => [...p, { id: nextId++, ...form }]); showToast("FAQ published"); }
-    else { setFaqs(p => p.map(f => f.id === editing ? { ...f, ...form } : f)); showToast("Changes saved"); }
+    if (editing === "new") { await addFaq(form); showToast("FAQ published"); }
+    else { await updateFaq(editing, form); showToast("Changes saved"); }
     cancelEdit();
   }
-  function deleteFaq(id) { setFaqs(p => p.filter(f => f.id !== id)); if (editing === id) cancelEdit(); showToast("FAQ deleted"); }
+  async function handleDeleteFaq(id) { await dbDeleteFaq(id); if (editing === id) cancelEdit(); showToast("FAQ deleted"); }
   function onDragStart(i) { setDragIdx(i); }
   function onDragOver(e, i) { e.preventDefault(); setOverIdx(i); }
-  function onDrop(i) {
+  async function onDrop(i) {
     if (dragIdx === null || dragIdx === i) return;
     const arr = [...faqs]; const [m] = arr.splice(dragIdx, 1); arr.splice(i, 0, m);
-    setFaqs(arr); setDragIdx(null); setOverIdx(null); showToast("Order updated");
+    await reorderFaqs(arr); setDragIdx(null); setOverIdx(null); showToast("Order updated");
   }
 
   // Supplier functions
-  function startEditSupplier(s) { setEditingSupplier(s.id); setSupplierForm({ business: s.business, contact: s.contact, email: s.email, phone: s.phone, category: s.category || "" }); }
-  function startNewSupplier() { setEditingSupplier("new"); setSupplierForm({ business: "", contact: "", email: "", phone: "", category: "" }); }
-  function cancelEditSupplier() { setEditingSupplier(null); setSupplierForm({ business: "", contact: "", email: "", phone: "", category: "" }); }
-  function saveSupplier() {
+  function startEditSupplier(s) { setEditingSupplier(s.id); setSupplierForm({ business: s.business, contact: s.contact || "", email: s.email || "", phone: s.phone || "", mobile: s.mobile || "", category: s.category || "" }); }
+  function startNewSupplier() { setEditingSupplier("new"); setSupplierForm({ business: "", contact: "", email: "", phone: "", mobile: "", category: "" }); }
+  function cancelEditSupplier() { setEditingSupplier(null); setSupplierForm({ business: "", contact: "", email: "", phone: "", mobile: "", category: "" }); }
+  async function saveSupplier() {
     if (!supplierForm.business.trim()) return;
-    if (editingSupplier === "new") { setSuppliers(p => [...p, { id: nextId++, ...supplierForm }]); showToast("Supplier added"); }
-    else { setSuppliers(p => p.map(s => s.id === editingSupplier ? { ...s, ...supplierForm } : s)); showToast("Supplier updated"); }
+    if (editingSupplier === "new") { await addSupplier(supplierForm); showToast("Supplier added"); }
+    else { await updateSupplier(editingSupplier, supplierForm); showToast("Supplier updated"); }
     cancelEditSupplier();
   }
-  function deleteSupplier(id) { setSuppliers(p => p.filter(s => s.id !== id)); if (editingSupplier === id) cancelEditSupplier(); showToast("Supplier removed"); }
+  async function handleDeleteSupplier(id) { await dbDeleteSupplier(id); if (editingSupplier === id) cancelEditSupplier(); showToast("Supplier removed"); }
 
   const fieldStyle = {
     width: "100%", padding: "9px 11px",
@@ -601,6 +615,7 @@ function AdminCMS({ faqs, setFaqs, suppliers, setSuppliers, resources, setResour
     fontFamily: T.fontSans, fontSize: 14, color: T.text,
     background: T.bg, outline: "none", resize: "vertical",
   };
+
 
   return (
     <div style={{ minHeight: "100vh", background: T.bg, fontFamily: T.fontSans }}>
@@ -610,7 +625,7 @@ function AdminCMS({ faqs, setFaqs, suppliers, setSuppliers, resources, setResour
       <div style={{ background: T.bg, padding: "0 20px", borderBottom: `1px solid ${T.border}` }}>
         <div style={{ maxWidth: 680, margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 56 }}>
-            <span style={{ fontFamily: T.fontSans, fontSize: 20, fontWeight: 600, color: T.text, letterSpacing: "-0.3px" }}>PGHELPDESK</span>
+            <span style={{ fontFamily: T.fontSans, fontSize: 20, fontWeight: 600, color: T.text, letterSpacing: "-0.3px" }}>PG Create</span>
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
               <button onClick={onViewSite} style={{ fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, background: "none", border: `1px solid ${T.border}`, borderRadius: 4, padding: "5px 12px", cursor: "pointer" }}>
                 ↗ View site
@@ -710,7 +725,7 @@ function AdminCMS({ faqs, setFaqs, suppliers, setSuppliers, resources, setResour
                 </div>
                 <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
                   <IconBtn onClick={() => startEdit(faq)}>✎</IconBtn>
-                  <IconBtn onClick={() => deleteFaq(faq.id)} danger>🗑</IconBtn>
+                  <IconBtn onClick={() => handleDeleteFaq(faq.id)} danger>🗑</IconBtn>
                 </div>
               </div>
             ))}
@@ -763,6 +778,10 @@ function AdminCMS({ faqs, setFaqs, suppliers, setSuppliers, resources, setResour
                   <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Phone</span>
                   <input value={supplierForm.phone} onChange={e => setSupplierForm(f => ({ ...f, phone: e.target.value }))} placeholder="Phone number" style={fieldStyle} />
                 </label>
+                <label>
+                  <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Mobile</span>
+                  <input value={supplierForm.mobile} onChange={e => setSupplierForm(f => ({ ...f, mobile: e.target.value }))} placeholder="Mobile number" style={fieldStyle} />
+                </label>
               </div>
               <label style={{ display: "block", marginBottom: 16 }}>
                 <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Email</span>
@@ -795,7 +814,7 @@ function AdminCMS({ faqs, setFaqs, suppliers, setSuppliers, resources, setResour
                 </div>
                 <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
                   <IconBtn onClick={() => startEditSupplier(s)}>✎</IconBtn>
-                  <IconBtn onClick={() => deleteSupplier(s.id)} danger>🗑</IconBtn>
+                  <IconBtn onClick={() => handleDeleteSupplier(s.id)} danger>🗑</IconBtn>
                 </div>
               </div>
             ))}
@@ -822,7 +841,7 @@ function AdminCMS({ faqs, setFaqs, suppliers, setSuppliers, resources, setResour
                 Array.from(e.dataTransfer.files).forEach(file => {
                   if (!allowed.includes(file.type)) return showToast("Only PDF, Word and Excel allowed");
                   const reader = new FileReader();
-                  reader.onload = ev => { setResources(p => [...p, { id: nextId++, name: file.name, size: file.size, type: file.type, data: ev.target.result, category: "", uploadedAt: new Date().toLocaleDateString() }]); showToast(file.name + " uploaded"); };
+                  reader.onload = ev => { addResource({ name: file.name, size: file.size, type: file.type, data: ev.target.result, category: "", uploaded_at: new Date().toLocaleDateString() }); showToast(file.name + " uploaded"); };
                   reader.readAsDataURL(file);
                 });
               }}
@@ -853,22 +872,21 @@ function AdminCMS({ faqs, setFaqs, suppliers, setSuppliers, resources, setResour
             <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, overflow: "hidden" }}>
               {resources.map((r, i) => {
                 const ext = r.name.split(".").pop().toUpperCase();
-                const icons = { PDF: "📄", DOCX: "📝", DOC: "📝", XLSX: "📊", XLS: "📊" };
+                const icons = { PDF: "📄", DOCX: "📄", DOC: "📄", XLSX: "📊", XLS: "📊" };
                 const icon = icons[ext] || "📎";
                 const sizeFmt = r.size < 1048576 ? (r.size / 1024).toFixed(1) + " KB" : (r.size / 1048576).toFixed(1) + " MB";
                 return (
                   <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 20px", borderBottom: i < resources.length - 1 ? `1px solid ${T.border}` : "none" }}>
-                    <span style={{ fontSize: 20, flexShrink: 0 }}>{icon}</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: 2 }}>{r.name}</p>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <input value={r.category} onChange={e => setResources(p => p.map(x => x.id === r.id ? { ...x, category: e.target.value } : x))}
+                        <input value={r.category} onChange={e => updateResource(r.id, { category: e.target.value })}
                           placeholder="Add category…"
                           style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, background: "none", border: "none", borderBottom: `1px solid ${T.border}`, outline: "none", width: 120, padding: "1px 0" }} />
                         <span style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted }}>{sizeFmt} · {ext}</span>
                       </div>
                     </div>
-                    <IconBtn onClick={() => { setResources(p => p.filter(x => x.id !== r.id)); showToast("File removed"); }} danger>🗑</IconBtn>
+                    <IconBtn onClick={() => { deleteResource(r.id); showToast("File removed"); }} danger>🗑</IconBtn>
                   </div>
                 );
               })}
@@ -892,8 +910,8 @@ function AdminCMS({ faqs, setFaqs, suppliers, setSuppliers, resources, setResour
 // ═══════════════════════════════════════════════════════════════════════════════
 // RESOURCES PAGE (public)
 // ═══════════════════════════════════════════════════════════════════════════════
-function ResourcesPage({ resources, onGoFAQ, onGoSuppliers, onGoAdmin }) {
-  const ICONS = { pdf: "📄", docx: "📝", doc: "📝", xlsx: "📊", xls: "📊" };
+function ResourcesPage({ resources, onGoFAQ, onGoSuppliers, onGoAdmin, noHero }) {
+  const ICONS = { pdf: "📄", docx: "📄", doc: "📄", xlsx: "📊", xls: "📊" };
 
   function getExt(name) { return name.split(".").pop().toLowerCase(); }
   function getIcon(name) { return ICONS[getExt(name)] || "📎"; }
@@ -917,8 +935,8 @@ function ResourcesPage({ resources, onGoFAQ, onGoSuppliers, onGoAdmin }) {
     <div style={{ minHeight: "100vh", background: T.bg, fontFamily: T.fontSans }}>
       <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }`}</style>
 
-      {/* Hero */}
-      <div style={{ width: "100%", height: "100vh", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+      {/* Hero — only on first load */}
+      {!noHero && <div style={{ width: "100%", height: "100vh", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
         <img src={HERO_SRC} alt="Hero" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(20,16,12,0.75) 0%, rgba(20,16,12,0.55) 50%, rgba(20,16,12,0.85) 100%)" }} />
         <div style={{ position: "absolute", top: 28, left: 0, right: 0, textAlign: "center" }}>
@@ -932,7 +950,7 @@ function ResourcesPage({ resources, onGoFAQ, onGoSuppliers, onGoAdmin }) {
           <span style={{ fontFamily: T.fontMono, fontSize: 10, color: "rgba(255,255,255,0.5)", letterSpacing: "0.15em" }}>SCROLL</span>
           <div style={{ width: 1, height: 40, background: "linear-gradient(to bottom, rgba(255,255,255,0.5), transparent)" }} />
         </div>
-      </div>
+      </div>}
 
       {/* Nav */}
       <div style={{ background: T.bg, padding: "0 20px", borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 10 }}>
@@ -976,7 +994,6 @@ function ResourcesPage({ resources, onGoFAQ, onGoSuppliers, onGoAdmin }) {
                 borderBottom: i < filtered.length - 1 ? `1px solid ${T.border}` : "none",
                 animation: "fadeUp 0.3s ease",
               }}>
-                <span style={{ fontSize: 22, flexShrink: 0 }}>{getIcon(r.name)}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.text, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: 2 }}>{r.name}</p>
                   <p style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textXMuted, letterSpacing: "0.05em" }}>
@@ -1013,18 +1030,90 @@ function ResourcesPage({ resources, onGoFAQ, onGoSuppliers, onGoAdmin }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function App() {
   useFonts();
-  const [faqs, setFaqs] = useState(INITIAL_FAQS);
-  const [suppliers, setSuppliers] = useState(INITIAL_SUPPLIERS);
+  const [faqs, setFaqs] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
   const [resources, setResources] = useState([]);
   const [view, setView] = useState("public");
+  const [noHero, setNoHero] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Load all data from Supabase on mount
+  useEffect(() => {
+    async function loadAll() {
+      const [f, s, r] = await Promise.all([
+        sbFetch("faqs", { query: "?order=sort_order.asc,id.asc" }),
+        sbFetch("suppliers", { query: "?order=id.asc" }),
+        sbFetch("resources", { query: "?order=id.asc" }),
+      ]);
+      if (f) setFaqs(f);
+      if (s) setSuppliers(s);
+      if (r) setResources(r);
+      setLoading(false);
+    }
+    loadAll();
+  }, []);
+
+  // ── FAQ operations ──────────────────────────────────────────────
+  async function addFaq(faq) {
+    const res = await sbFetch("faqs", { method: "POST", body: { question: faq.question, answer: faq.answer, topic: faq.topic || null, sort_order: faqs.length } });
+    if (res?.[0]) setFaqs(p => [...p, res[0]]);
+  }
+  async function updateFaq(id, data) {
+    await sbFetch("faqs", { method: "PATCH", query: `?id=eq.${id}`, body: data });
+    setFaqs(p => p.map(f => f.id === id ? { ...f, ...data } : f));
+  }
+  async function deleteFaq(id) {
+    await sbFetch("faqs", { method: "DELETE", query: `?id=eq.${id}` });
+    setFaqs(p => p.filter(f => f.id !== id));
+  }
+  async function reorderFaqs(newFaqs) {
+    setFaqs(newFaqs);
+    await Promise.all(newFaqs.map((f, i) => sbFetch("faqs", { method: "PATCH", query: `?id=eq.${f.id}`, body: { sort_order: i } })));
+  }
+
+  // ── Supplier operations ─────────────────────────────────────────
+  async function addSupplier(s) {
+    const res = await sbFetch("suppliers", { method: "POST", body: s });
+    if (res?.[0]) setSuppliers(p => [...p, res[0]]);
+  }
+  async function updateSupplier(id, data) {
+    await sbFetch("suppliers", { method: "PATCH", query: `?id=eq.${id}`, body: data });
+    setSuppliers(p => p.map(s => s.id === id ? { ...s, ...data } : s));
+  }
+  async function deleteSupplier(id) {
+    await sbFetch("suppliers", { method: "DELETE", query: `?id=eq.${id}` });
+    setSuppliers(p => p.filter(s => s.id !== id));
+  }
+
+  // ── Resource operations ─────────────────────────────────────────
+  async function addResource(r) {
+    const res = await sbFetch("resources", { method: "POST", body: r });
+    if (res?.[0]) setResources(p => [...p, res[0]]);
+  }
+  async function updateResource(id, data) {
+    await sbFetch("resources", { method: "PATCH", query: `?id=eq.${id}`, body: data });
+    setResources(p => p.map(r => r.id === id ? { ...r, ...data } : r));
+  }
+  async function deleteResource(id) {
+    await sbFetch("resources", { method: "DELETE", query: `?id=eq.${id}` });
+    setResources(p => p.filter(r => r.id !== id));
+  }
+
+  if (loading) return (
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#e8e4de", fontFamily: "sans-serif" }}>
+      <p style={{ color: "#888", fontSize: 15 }}>Loading…</p>
+    </div>
+  );
+
+  const dbOps = { addFaq, updateFaq, deleteFaq, reorderFaqs, addSupplier, updateSupplier, deleteSupplier, addResource, updateResource, deleteResource };
 
   return (
     <>
-      {view === "public" && <PublicPage faqs={faqs} onGoAdmin={() => setView("login")} onGoSuppliers={() => setView("suppliers")} onGoResources={() => setView("resources")} />}
-      {view === "suppliers" && <SuppliersPage suppliers={suppliers} onGoFAQ={() => setView("public")} onGoSuppliers={() => setView("suppliers")} onGoResources={() => setView("resources")} onGoAdmin={() => setView("login")} />}
-      {view === "resources" && <ResourcesPage resources={resources} onGoFAQ={() => setView("public")} onGoSuppliers={() => setView("suppliers")} onGoAdmin={() => setView("login")} />}
+      {view === "public" && <PublicPage faqs={faqs} onGoAdmin={() => setView("login")} onGoSuppliers={() => { setNoHero(true); setView("suppliers"); }} onGoResources={() => { setNoHero(true); setView("resources"); }} />}
+      {view === "suppliers" && <SuppliersPage noHero={noHero} suppliers={suppliers} onGoFAQ={() => { setNoHero(true); setView("public"); }} onGoSuppliers={() => setView("suppliers")} onGoResources={() => setView("resources")} onGoAdmin={() => setView("login")} />}
+      {view === "resources" && <ResourcesPage noHero={noHero} resources={resources} onGoFAQ={() => { setNoHero(true); setView("public"); }} onGoSuppliers={() => setView("suppliers")} onGoAdmin={() => setView("login")} />}
       {view === "login" && <AdminLogin onLogin={() => setView("admin")} onBack={() => setView("public")} />}
-      {view === "admin" && <AdminCMS faqs={faqs} setFaqs={setFaqs} suppliers={suppliers} setSuppliers={setSuppliers} resources={resources} setResources={setResources} onLogout={() => setView("public")} onViewSite={() => setView("public")} />}
+      {view === "admin" && <AdminCMS faqs={faqs} suppliers={suppliers} resources={resources} dbOps={dbOps} onLogout={() => setView("public")} onViewSite={() => setView("public")} />}
     </>
   );
 }
