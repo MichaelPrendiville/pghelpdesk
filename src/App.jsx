@@ -255,16 +255,13 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin }) {
       </div>
 
       {/* ── Sticky tab bar ── */}
-      <div style={{ background: T.bg, padding: "0 20px", borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 10 }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex" }}>
-            {[{ label: "FAQs", tab: "faqs", ref: faqRef }, { label: "Preferred Suppliers", tab: "suppliers", ref: suppliersRef }, { label: "Resources", tab: "resources", ref: resourcesRef }].map(t => (
-              <button key={t.tab} onClick={() => scrollTo(t.ref, t.tab)} style={{ fontFamily: T.fontSans, fontSize: 14, color: activeTab === t.tab ? T.text : T.textMuted, fontWeight: activeTab === t.tab ? 500 : 400, background: "none", border: "none", borderBottom: activeTab === t.tab ? `2px solid ${T.text}` : "2px solid transparent", padding: "0 16px", height: 52, cursor: "pointer", transition: "all 0.15s" }}>
-                {t.label}
-              </button>
-            ))}
-          </div>
-          <button onClick={onGoAdmin} style={{ fontFamily: T.fontSans, fontSize: 12, color: T.textXMuted, background: "none", border: "none", cursor: "pointer" }}>Admin</button>
+      <div style={{ background: T.bg, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 10 }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          {[{ label: "FAQs", tab: "faqs", ref: faqRef }, { label: "Preferred Suppliers", tab: "suppliers", ref: suppliersRef }, { label: "Resources", tab: "resources", ref: resourcesRef }].map(t => (
+            <button key={t.tab} onClick={() => scrollTo(t.ref, t.tab)} style={{ flex: 1, fontFamily: T.fontSans, fontSize: 14, color: activeTab === t.tab ? T.text : T.textMuted, fontWeight: activeTab === t.tab ? 500 : 400, background: "none", border: "none", borderBottom: activeTab === t.tab ? `2px solid ${T.text}` : "2px solid transparent", padding: "0 8px", height: 52, cursor: "pointer", transition: "all 0.15s" }}>
+              {t.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -313,7 +310,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin }) {
       </div>
 
       {/* ── Preferred Suppliers Section ── */}
-      <div ref={suppliersRef} style={{ borderTop: `8px solid ${T.border}`, background: T.bg }}>
+      <div ref={suppliersRef} style={{ background: "#dedad3" }}>
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "48px 20px 80px" }} onClick={e => e.stopPropagation()}>
           <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 8 }}>Preferred Suppliers</h2>
           <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 24 }}>Our trusted network of preferred suppliers and service providers.</p>
@@ -343,7 +340,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin }) {
       </div>
 
       {/* ── Resources Section ── */}
-      <div ref={resourcesRef} style={{ borderTop: `8px solid ${T.border}`, background: T.bg }}>
+      <div ref={resourcesRef} style={{ background: "#d2cdc6" }}>
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "48px 20px 80px" }}>
           <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 8 }}>Resources</h2>
           <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 32 }}>Access and download documents, forms and guides.</p>
