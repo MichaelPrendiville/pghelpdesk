@@ -138,8 +138,9 @@ function SupplierItem({ supplier, index }) {
   return (
     <div style={{ borderBottom: `1px solid ${T.border}` }}>
       <button onClick={() => setOpen(!open)} style={{ width: "100%", background: "none", border: "none", padding: "18px 0", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, cursor: "pointer", textAlign: "left" }}>
-        <span style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <span style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
           <span style={{ fontFamily: T.fontSans, fontSize: 17, color: T.text, fontWeight: 400, lineHeight: 1.3 }}>{supplier.business}</span>
+          {supplier.category && <span style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase" }}>{supplier.category}</span>}
         </span>
         <span style={{ fontFamily: T.fontMono, fontSize: 16, color: T.textMuted, flexShrink: 0, transform: open ? "rotate(45deg)" : "rotate(0deg)", transition: "transform 0.25s ease", display: "block" }}>+</span>
       </button>
@@ -300,7 +301,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
 
       {/* ── Sticky tab bar ── */}
       <div style={{ borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 10, display: "flex" }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", display: "flex", width: "100%" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", width: "100%" }}>
           {[
             { label: "FAQs", tab: "faqs", ref: faqRef, bg: T.bg },
             { label: "Preferred Suppliers", tab: "suppliers", ref: suppliersRef, bg: "#dedad3" },
@@ -322,7 +323,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
       </div>
 
       {/* ── FAQs Section ── */}
-      <div ref={faqRef} style={{ maxWidth: 680, margin: "0 auto", padding: "48px 20px 80px" }} onClick={() => setDropdownOpen(false)}>
+      <div ref={faqRef} style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 20px 80px" }} onClick={() => setDropdownOpen(false)}>
         <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 8 }}>FAQs</h2>
         <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 24, maxWidth: 480 }}>
           Browse answers to common questions. Can't find what you're looking for? Get in touch with our support team.
@@ -369,7 +370,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
       {/* ── Preferred Suppliers Section ── */}
       <div ref={suppliersRef} style={{ background: "#dedad3" }}>
         {/* Banner image - content width */}
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "32px 20px 0" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 0" }}>
           <div style={{ width: "100%", height: 220, overflow: "hidden", position: "relative", borderRadius: 8 }}>
             <img src={suppliersBanner ? suppliersBanner : HERO_SRC} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block", backgroundColor: "#b0a898" }} />
             <div style={{ position: "absolute", inset: 0, background: "rgba(20,16,12,0.35)" }} />
@@ -378,7 +379,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
             </div>
           </div>
         </div>
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "32px 20px 80px" }} onClick={e => e.stopPropagation()}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 80px" }} onClick={e => e.stopPropagation()}>
           <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 24 }}>Our trusted network of preferred suppliers and service providers.</p>
 
           {/* Category dropdown */}
@@ -408,7 +409,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
       {/* ── Resources Section ── */}
       <div ref={resourcesRef} style={{ background: "#d2cdc6" }}>
         {/* Banner image - content width */}
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "32px 20px 0" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 0" }}>
           <div style={{ width: "100%", height: 220, overflow: "hidden", position: "relative", borderRadius: 8 }}>
             <img src={resourcesBanner ? resourcesBanner : HERO_SRC} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
             <div style={{ position: "absolute", inset: 0, background: "rgba(20,16,12,0.35)" }} />
@@ -417,7 +418,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
             </div>
           </div>
         </div>
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "32px 20px 80px" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 80px" }}>
           <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 32 }}>Access and download documents, forms and guides.</p>
 
           {resources.length === 0 ? (
@@ -591,7 +592,7 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
 
       {/* Top bar */}
       <div style={{ background: T.bg, padding: "0 20px", borderBottom: `1px solid ${T.border}` }}>
-        <div style={{ maxWidth: 680, margin: "0 auto" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 56 }}>
             <span style={{ fontFamily: T.fontSans, fontSize: 20, fontWeight: 600, color: T.text, letterSpacing: "-0.3px" }}>PG Create</span>
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -620,7 +621,7 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
       </div>
 
       {/* Page content */}
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "32px 20px 80px" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 80px" }}>
 
         {/* ── FAQs Tab ── */}
         {activeTab === "faqs" && (<>
