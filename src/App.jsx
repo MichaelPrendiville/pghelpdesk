@@ -417,8 +417,8 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
             </div>
           </div>
 
-          <div style={{ borderTop: `1px solid ${T.border}` }}>
-            {suppliers.length === 0 && <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textXMuted, padding: "24px 0", textAlign: "center" }}>No suppliers added yet.</p>}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "0 24px", borderTop: `1px solid ${T.border}` }}>
+            {suppliers.length === 0 && <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textXMuted, padding: "24px 0", textAlign: "center", gridColumn: "1 / -1" }}>No suppliers added yet.</p>}
             {suppliersFiltered.map((s, i) => <SupplierItem key={s.id} supplier={s} index={i} />)}
           </div>
         </div>
