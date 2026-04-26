@@ -368,12 +368,14 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
 
       {/* ── Preferred Suppliers Section ── */}
       <div ref={suppliersRef} style={{ background: "#dedad3" }}>
-        {/* Banner image - full bleed */}
-        <div style={{ width: "100%", height: 220, overflow: "hidden", position: "relative", display: "block" }}>
-          <img src={suppliersBanner ? suppliersBanner : HERO_SRC} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block", backgroundColor: "#b0a898" }} />
-          <div style={{ position: "absolute", inset: 0, background: "rgba(20,16,12,0.35)" }} />
-          <div style={{ position: "absolute", bottom: 24, left: 24 }}>
-            <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: "#ffffff", letterSpacing: "-0.5px" }}>Preferred Suppliers</h2>
+        {/* Banner image - content width */}
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "32px 20px 0" }}>
+          <div style={{ width: "100%", height: 220, overflow: "hidden", position: "relative", borderRadius: 8 }}>
+            <img src={suppliersBanner ? suppliersBanner : HERO_SRC} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block", backgroundColor: "#b0a898" }} />
+            <div style={{ position: "absolute", inset: 0, background: "rgba(20,16,12,0.35)" }} />
+            <div style={{ position: "absolute", bottom: 24, left: 24 }}>
+              <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: "#ffffff", letterSpacing: "-0.5px" }}>Preferred Suppliers</h2>
+            </div>
           </div>
         </div>
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "32px 20px 80px" }} onClick={e => e.stopPropagation()}>
@@ -405,12 +407,14 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
 
       {/* ── Resources Section ── */}
       <div ref={resourcesRef} style={{ background: "#d2cdc6" }}>
-        {/* Banner image - full bleed */}
-        <div style={{ width: "100%", height: 220, overflow: "hidden", position: "relative", display: "block" }}>
-          <img src={resourcesBanner ? resourcesBanner : HERO_SRC} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
-          <div style={{ position: "absolute", inset: 0, background: "rgba(20,16,12,0.35)" }} />
-          <div style={{ position: "absolute", bottom: 24, left: 24 }}>
-            <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: "#ffffff", letterSpacing: "-0.5px" }}>Resources</h2>
+        {/* Banner image - content width */}
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "32px 20px 0" }}>
+          <div style={{ width: "100%", height: 220, overflow: "hidden", position: "relative", borderRadius: 8 }}>
+            <img src={resourcesBanner ? resourcesBanner : HERO_SRC} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
+            <div style={{ position: "absolute", inset: 0, background: "rgba(20,16,12,0.35)" }} />
+            <div style={{ position: "absolute", bottom: 24, left: 24 }}>
+              <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: "#ffffff", letterSpacing: "-0.5px" }}>Resources</h2>
+            </div>
           </div>
         </div>
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "32px 20px 80px" }}>
