@@ -193,26 +193,25 @@ const faqRef = useRef(null);
 const suppliersRef = useRef(null);
 const resourcesRef = useRef(null);
 
-// Auto-update active tab based on scroll position
+// Track active tab by scroll position (reliable fallback)
 useEffect(() => {
-const sections = [
-{ ref: faqRef, tab: “faqs” },
-{ ref: suppliersRef, tab: “suppliers” },
-{ ref: resourcesRef, tab: “resources” },
+function onScroll() {
+const offsets = [
+{ tab: “faqs”, ref: faqRef },
+{ tab: “suppliers”, ref: suppliersRef },
+{ tab: “resources”, ref: resourcesRef },
 ];
-const observer = new IntersectionObserver(
-entries => {
-entries.forEach(entry => {
-if (entry.isIntersecting) {
-const match = sections.find(s => s.ref.current === entry.target);
-if (match) setActiveTab(match.tab);
+const scrollY = window.scrollY + 100; // offset for sticky nav
+let current = “faqs”;
+offsets.forEach(({ tab, ref }) => {
+if (ref.current && ref.current.offsetTop <= scrollY) {
+current = tab;
 }
 });
-},
-{ threshold: 0.25 }
-);
-sections.forEach(s => { if (s.ref.current) observer.observe(s.ref.current); });
-return () => observer.disconnect();
+setActiveTab(current);
+}
+window.addEventListener(“scroll”, onScroll, { passive: true });
+return () => window.removeEventListener(“scroll”, onScroll);
 }, []);
 
 const topics = [“All Topics”, …Array.from(new Set(faqs.map(f => f.topic).filter(Boolean)))];
@@ -368,9 +367,9 @@ return (
 
   {/* ── Preferred Suppliers Section ── */}
   <div ref={suppliersRef} style={{ background: "#dedad3" }}>
-    {/* Banner image */}
-    <div style={{ width: "100%", height: 220, overflow: "hidden", position: "relative" }}>
-      <img src={suppliersBanner || HERO_SRC} alt="Preferred Suppliers" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
+    {/* Banner image - full bleed */}
+    <div style={{ width: "100%", height: 220, overflow: "hidden", position: "relative", display: "block" }}>
+      <img src={suppliersBanner ? suppliersBanner : HERO_SRC} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
       <div style={{ position: "absolute", inset: 0, background: "rgba(20,16,12,0.35)" }} />
       <div style={{ position: "absolute", bottom: 24, left: 24 }}>
         <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: "#ffffff", letterSpacing: "-0.5px" }}>Preferred Suppliers</h2>
@@ -405,9 +404,9 @@ return (
 
   {/* ── Resources Section ── */}
   <div ref={resourcesRef} style={{ background: "#d2cdc6" }}>
-    {/* Banner image */}
-    <div style={{ width: "100%", height: 220, overflow: "hidden", position: "relative" }}>
-      <img src={resourcesBanner || HERO_SRC} alt="Resources" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
+    {/* Banner image - full bleed */}
+    <div style={{ width: "100%", height: 220, overflow: "hidden", position: "relative", display: "block" }}>
+      <img src={resourcesBanner ? resourcesBanner : HERO_SRC} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
       <div style={{ position: "absolute", inset: 0, background: "rgba(20,16,12,0.35)" }} />
       <div style={{ position: "absolute", bottom: 24, left: 24 }}>
         <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: "#ffffff", letterSpacing: "-0.5px" }}>Resources</h2>
