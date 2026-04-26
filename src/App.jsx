@@ -189,6 +189,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [catDropdownOpen, setCatDropdownOpen] = useState(false);
   const [category, setCategory] = useState("All Categories");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const faqRef = useRef(null);
   const suppliersRef = useRef(null);
@@ -206,6 +207,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin }) {
 
   function scrollTo(ref, tab) {
     setActiveTab(tab);
+    setMenuOpen(false);
     ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -223,41 +225,75 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin }) {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: T.bg, fontFamily: T.fontSans }} onClick={() => { setDropdownOpen(false); setCatDropdownOpen(false); }}>
+    <div style={{ minHeight: "100vh", background: T.bg, fontFamily: T.fontSans }} onClick={() => { setDropdownOpen(false); setCatDropdownOpen(false); setMenuOpen(false); }}>
       <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} } input::placeholder { color: #aaa89f; }`}</style>
 
       {/* ── Hero ── */}
       <div style={{ width: "100%", height: "100vh", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
         <img src={HERO_SRC} alt="Hero" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(20,16,12,0.75) 0%, rgba(20,16,12,0.55) 50%, rgba(20,16,12,0.85) 100%)" }} />
-        <div style={{ position: "absolute", top: 28, left: 0, right: 0, textAlign: "center" }}>
-          <p style={{ fontFamily: "'Playfair Display', 'Georgia', serif", fontSize: "clamp(0.95rem, 2vw, 1.25rem)", fontWeight: 400, color: "#ffffff", letterSpacing: "0.05em", textShadow: "0 1px 8px rgba(0,0,0,0.4)", margin: 0 }}>Prendiville Group</p>
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(20,16,12,0.65) 0%, rgba(20,16,12,0.4) 50%, rgba(20,16,12,0.75) 100%)" }} />
+
+        {/* Top bar — hamburger left, logo centre, admin right */}
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px" }}>
+          {/* Hamburger */}
+          <button onClick={e => { e.stopPropagation(); setMenuOpen(o => !o); }} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", gap: 5, padding: 4 }}>
+            <span style={{ display: "block", width: 22, height: 1.5, background: "#ffffff" }} />
+            <span style={{ display: "block", width: 22, height: 1.5, background: "#ffffff" }} />
+            <span style={{ display: "block", width: 22, height: 1.5, background: "#ffffff" }} />
+          </button>
+
+          {/* Logo — centre */}
+          <p style={{ fontFamily: T.fontSans, fontSize: 16, fontWeight: 500, color: "#ffffff", letterSpacing: "0.12em", textTransform: "uppercase", margin: 0, position: "absolute", left: "50%", transform: "translateX(-50%)" }}>PG Create</p>
+
+          {/* Admin icon — right */}
+          <button onClick={onGoAdmin} style={{ background: "none", border: "none", cursor: "pointer", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32 }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+            </svg>
+          </button>
         </div>
-        <div style={{ position: "relative", textAlign: "center", padding: "0 24px" }}>
-          <p style={{ fontFamily: T.fontMono, fontSize: 11, color: "rgba(255,255,255,0.6)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 16 }}>PG Create</p>
-          <h1 style={{ fontFamily: T.fontSans, fontSize: "clamp(2.5rem, 7vw, 5rem)", fontWeight: 300, color: "#ffffff", letterSpacing: "-1.5px", lineHeight: 1.05, marginBottom: 40 }}>How can we help?</h1>
-          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            {[{ label: "FAQs", ref: faqRef, tab: "faqs" }, { label: "Preferred Suppliers", ref: suppliersRef, tab: "suppliers" }, { label: "Resources", ref: resourcesRef, tab: "resources" }].map(btn => (
-              <button key={btn.label} onClick={() => scrollTo(btn.ref, btn.tab)} style={{ fontFamily: T.fontSans, fontSize: 14, fontWeight: 500, color: "#ffffff", background: "rgba(255,255,255,0.12)", border: "1.5px solid rgba(255,255,255,0.5)", borderRadius: 6, padding: "12px 28px", cursor: "pointer", backdropFilter: "blur(8px)" }}>
-                {btn.label}
+
+        {/* Hamburger menu dropdown */}
+        {menuOpen && (
+          <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 64, left: 16, background: "rgba(20,16,12,0.92)", backdropFilter: "blur(12px)", borderRadius: 8, overflow: "hidden", animation: "fadeUp 0.2s ease", minWidth: 220, zIndex: 100 }}>
+            {[{ label: "FAQs", ref: faqRef, tab: "faqs" }, { label: "Preferred Suppliers", ref: suppliersRef, tab: "suppliers" }, { label: "Resources", ref: resourcesRef, tab: "resources" }].map((item, i, arr) => (
+              <button key={item.label} onClick={() => scrollTo(item.ref, item.tab)} style={{ display: "block", width: "100%", textAlign: "left", padding: "16px 20px", fontFamily: T.fontSans, fontSize: 15, color: "#ffffff", background: "none", border: "none", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.1)" : "none", cursor: "pointer", letterSpacing: "0.02em" }}>
+                {item.label}
               </button>
             ))}
           </div>
+        )}
+
+        {/* Centre hero text */}
+        <div style={{ position: "relative", textAlign: "center", padding: "0 24px" }}>
+          <h1 style={{ fontFamily: T.fontSans, fontSize: "clamp(2.5rem, 7vw, 5rem)", fontWeight: 300, color: "#ffffff", letterSpacing: "-1.5px", lineHeight: 1.05 }}>How can we help?</h1>
         </div>
+
+        {/* Scroll cue */}
         <div style={{ position: "absolute", bottom: 36, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
           <span style={{ fontFamily: T.fontMono, fontSize: 10, color: "rgba(255,255,255,0.5)", letterSpacing: "0.15em" }}>SCROLL</span>
           <div style={{ width: 1, height: 40, background: "linear-gradient(to bottom, rgba(255,255,255,0.5), transparent)" }} />
         </div>
-        <div style={{ position: "absolute", bottom: 28, right: 24 }}>
-          <button onClick={onGoAdmin} style={{ fontFamily: T.fontSans, fontSize: 12, color: "rgba(255,255,255,0.35)", background: "none", border: "none", cursor: "pointer" }}>Admin</button>
-        </div>
       </div>
 
       {/* ── Sticky tab bar ── */}
-      <div style={{ background: T.bg, borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 10 }}>
-        <div style={{ maxWidth: 680, margin: "0 auto", display: "flex" }}>
-          {[{ label: "FAQs", tab: "faqs", ref: faqRef }, { label: "Preferred Suppliers", tab: "suppliers", ref: suppliersRef }, { label: "Resources", tab: "resources", ref: resourcesRef }].map(t => (
-            <button key={t.tab} onClick={() => scrollTo(t.ref, t.tab)} style={{ flex: 1, fontFamily: T.fontSans, fontSize: 14, color: activeTab === t.tab ? T.text : T.textMuted, fontWeight: activeTab === t.tab ? 500 : 400, background: "none", border: "none", borderBottom: activeTab === t.tab ? `2px solid ${T.text}` : "2px solid transparent", padding: "0 8px", height: 52, cursor: "pointer", transition: "all 0.15s" }}>
+      <div style={{ borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 10, display: "flex" }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", display: "flex", width: "100%" }}>
+          {[
+            { label: "FAQs", tab: "faqs", ref: faqRef, bg: T.bg },
+            { label: "Preferred Suppliers", tab: "suppliers", ref: suppliersRef, bg: "#dedad3" },
+            { label: "Resources", tab: "resources", ref: resourcesRef, bg: "#d2cdc6" },
+          ].map(t => (
+            <button key={t.tab} onClick={() => scrollTo(t.ref, t.tab)} style={{
+              flex: 1, fontFamily: T.fontSans, fontSize: 14,
+              color: activeTab === t.tab ? T.text : T.textMuted,
+              fontWeight: activeTab === t.tab ? 500 : 400,
+              background: t.bg,
+              border: "none",
+              borderBottom: activeTab === t.tab ? `2px solid ${T.text}` : "2px solid transparent",
+              padding: "0 8px", height: 52, cursor: "pointer", transition: "all 0.15s",
+            }}>
               {t.label}
             </button>
           ))}
