@@ -190,6 +190,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [catDropdownOpen, setCatDropdownOpen] = useState(false);
   const [category, setCategory] = useState("All Categories");
+  const [supplierSearch, setSupplierSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
 
   const faqRef = useRef(null);
@@ -225,7 +226,11 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
   });
 
   const categories = ["All Categories", ...Array.from(new Set(suppliers.map(s => s.category).filter(Boolean)))];
-  const suppliersFiltered = category === "All Categories" ? suppliers : suppliers.filter(s => s.category === category);
+  const suppliersFiltered = suppliers.filter(s => {
+    const matchesCat = category === "All Categories" || s.category === category;
+    const matchesSearch = !supplierSearch || s.business.toLowerCase().includes(supplierSearch.toLowerCase()) || (s.contact || "").toLowerCase().includes(supplierSearch.toLowerCase());
+    return matchesCat && matchesSearch;
+  });
 
   function scrollTo(ref, tab) {
     setActiveTab(tab);
@@ -330,28 +335,31 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
         </p>
         <div style={{ borderTop: `1px solid ${T.border}`, marginBottom: 24 }} />
 
-        {/* Topic dropdown */}
-        <div style={{ position: "relative", marginBottom: 16 }} onClick={e => e.stopPropagation()}>
-          <button onClick={() => setDropdownOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", fontFamily: T.fontSans, fontSize: 13, color: T.text, background: "transparent", border: `1px solid ${T.text}`, borderRadius: 6, padding: "10px 12px", cursor: "pointer" }}>
-            <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 12 }}>☰</span>{topic}</span>
-            <span style={{ fontSize: 10, transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", display: "inline-block" }}>▾</span>
-          </button>
-          {dropdownOpen && (
-            <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 6, overflow: "hidden", zIndex: 20, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", animation: "fadeUp 0.15s ease" }}>
-              {topics.map(t => (
-                <button key={t} onClick={() => { setTopic(t); setDropdownOpen(false); }} style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", fontFamily: T.fontSans, fontSize: 13, color: t === topic ? T.text : T.textMuted, fontWeight: t === topic ? 500 : 400, background: "none", border: "none", cursor: "pointer", borderBottom: `1px solid ${T.border}` }}>
-                  {t === topic && <span style={{ marginRight: 6, fontSize: 10 }}>✓</span>}{t}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Topic dropdown + Search — side by side */}
+        <div style={{ display: "flex", gap: 12, marginBottom: 24 }} onClick={e => e.stopPropagation()}>
+          {/* Topic dropdown */}
+          <div style={{ position: "relative", width: 220, flexShrink: 0 }}>
+            <button onClick={() => setDropdownOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", fontFamily: T.fontSans, fontSize: 13, color: T.text, background: "transparent", border: `1px solid ${T.text}`, borderRadius: 6, padding: "10px 12px", cursor: "pointer" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 12 }}>☰</span>{topic}</span>
+              <span style={{ fontSize: 10, transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", display: "inline-block" }}>▾</span>
+            </button>
+            {dropdownOpen && (
+              <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 6, overflow: "hidden", zIndex: 20, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", animation: "fadeUp 0.15s ease" }}>
+                {topics.map(t => (
+                  <button key={t} onClick={() => { setTopic(t); setDropdownOpen(false); }} style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", fontFamily: T.fontSans, fontSize: 13, color: t === topic ? T.text : T.textMuted, fontWeight: t === topic ? 500 : 400, background: "none", border: "none", cursor: "pointer", borderBottom: `1px solid ${T.border}` }}>
+                    {t === topic && <span style={{ marginRight: 6, fontSize: 10 }}>✓</span>}{t}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
-        {/* Search */}
-        <div style={{ position: "relative", marginBottom: 24 }}>
-          <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: T.text, fontSize: 14, pointerEvents: "none" }}>⌕</span>
-          <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search FAQs…" style={{ width: "100%", padding: "10px 36px 10px 34px", border: `1px solid ${T.text}`, borderRadius: 6, fontFamily: T.fontSans, fontSize: 14, color: T.text, background: "transparent", outline: "none" }} />
-          {query && <button onClick={() => setQuery("")} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: T.textMuted, fontSize: 16 }}>×</button>}
+          {/* Search */}
+          <div style={{ position: "relative", flex: 1 }}>
+            <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: T.text, fontSize: 14, pointerEvents: "none" }}>⌕</span>
+            <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search FAQs…" style={{ width: "100%", padding: "10px 36px 10px 34px", border: `1px solid ${T.text}`, borderRadius: 6, fontFamily: T.fontSans, fontSize: 14, color: T.text, background: "transparent", outline: "none", boxSizing: "border-box" }} />
+            {query && <button onClick={() => setQuery("")} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: T.textMuted, fontSize: 16 }}>×</button>}
+          </div>
         </div>
 
         {/* FAQ list */}
@@ -382,21 +390,31 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 80px" }} onClick={e => e.stopPropagation()}>
           <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 24 }}>Our trusted network of preferred suppliers and service providers.</p>
 
-          {/* Category dropdown */}
-          <div style={{ position: "relative", marginBottom: 24 }} onClick={e => e.stopPropagation()}>
-            <button onClick={() => setCatDropdownOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", fontFamily: T.fontSans, fontSize: 13, color: T.text, background: "transparent", border: `1px solid ${T.text}`, borderRadius: 6, padding: "10px 12px", cursor: "pointer" }}>
-              <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 12 }}>☰</span>{category}</span>
-              <span style={{ fontSize: 10, transform: catDropdownOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", display: "inline-block" }}>▾</span>
-            </button>
-            {catDropdownOpen && (
-              <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 6, overflow: "hidden", zIndex: 20, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", animation: "fadeUp 0.15s ease" }}>
-                {categories.map(c => (
-                  <button key={c} onClick={() => { setCategory(c); setCatDropdownOpen(false); }} style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", fontFamily: T.fontSans, fontSize: 13, color: c === category ? T.text : T.textMuted, fontWeight: c === category ? 500 : 400, background: "none", border: "none", cursor: "pointer", borderBottom: `1px solid ${T.border}` }}>
-                    {c === category && <span style={{ marginRight: 6, fontSize: 10 }}>✓</span>}{c}
-                  </button>
-                ))}
-              </div>
-            )}
+          {/* Category dropdown + Search — side by side */}
+          <div style={{ display: "flex", gap: 12, marginBottom: 24 }} onClick={e => e.stopPropagation()}>
+            {/* Category dropdown */}
+            <div style={{ position: "relative", width: 220, flexShrink: 0 }}>
+              <button onClick={() => setCatDropdownOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", fontFamily: T.fontSans, fontSize: 13, color: T.text, background: "transparent", border: `1px solid ${T.text}`, borderRadius: 6, padding: "10px 12px", cursor: "pointer" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 12 }}>☰</span>{category}</span>
+                <span style={{ fontSize: 10, transform: catDropdownOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", display: "inline-block" }}>▾</span>
+              </button>
+              {catDropdownOpen && (
+                <div style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: T.bg, border: `1px solid ${T.border}`, borderRadius: 6, overflow: "hidden", zIndex: 20, boxShadow: "0 4px 16px rgba(0,0,0,0.08)", animation: "fadeUp 0.15s ease" }}>
+                  {categories.map(c => (
+                    <button key={c} onClick={() => { setCategory(c); setCatDropdownOpen(false); }} style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", fontFamily: T.fontSans, fontSize: 13, color: c === category ? T.text : T.textMuted, fontWeight: c === category ? 500 : 400, background: "none", border: "none", cursor: "pointer", borderBottom: `1px solid ${T.border}` }}>
+                      {c === category && <span style={{ marginRight: 6, fontSize: 10 }}>✓</span>}{c}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Supplier search */}
+            <div style={{ position: "relative", flex: 1 }}>
+              <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: T.text, fontSize: 14, pointerEvents: "none" }}>⌕</span>
+              <input type="text" value={supplierSearch} onChange={e => setSupplierSearch(e.target.value)} placeholder="Search suppliers…" style={{ width: "100%", padding: "10px 36px 10px 34px", border: `1px solid ${T.text}`, borderRadius: 6, fontFamily: T.fontSans, fontSize: 14, color: T.text, background: "transparent", outline: "none", boxSizing: "border-box" }} />
+              {supplierSearch && <button onClick={() => setSupplierSearch("")} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: T.textMuted, fontSize: 16 }}>×</button>}
+            </div>
           </div>
 
           <div style={{ borderTop: `1px solid ${T.border}` }}>
