@@ -1357,6 +1357,7 @@ export default function App() {
     setResources(newResources);
     await Promise.all(newResources.map((r, i) => sbFetch("resources", { method: "PATCH", query: `?id=eq.${r.id}`, body: { sort_order: i } })));
   }
+  async function reorderFaqs(newFaqs) {
     setFaqs(newFaqs);
     await Promise.all(newFaqs.map((f, i) => sbFetch("faqs", { method: "PATCH", query: `?id=eq.${f.id}`, body: { sort_order: i } })));
   }
