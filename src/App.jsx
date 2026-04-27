@@ -32,12 +32,12 @@ let nextId = 6;
 
 // ── Design tokens matching SenSay ─────────────────────────────────────────────
 const T = {
-  bg: "#e8e4de",
+  bg: "#f5f5f3",
   surface: "#ffffff",
-  text: "#111110",
-  textMuted: "#888580",
-  textXMuted: "#aaa89f",
-  border: "#d8d4ce",
+  text: "#1a1a1a",
+  textMuted: "#6b6b6b",
+  textXMuted: "#9e9e9e",
+  border: "#e0e0e0",
   accent: "#2563eb",
   danger: "#dc2626",
   fontSans: "'DM Sans', sans-serif",
@@ -267,7 +267,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
       {/* ── Hero ── */}
       <div style={{ width: "100%", height: "100vh", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
         <img src={HERO_SRC} alt="Hero" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(20,16,12,0.65) 0%, rgba(20,16,12,0.4) 50%, rgba(20,16,12,0.75) 100%)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,10,10,0.6) 0%, rgba(10,10,10,0.35) 50%, rgba(10,10,10,0.7) 100%)" }} />
 
         {/* Top bar — hamburger left, logo centre, admin right */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px" }}>
@@ -317,9 +317,9 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
       <div style={{ borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 10, display: "flex" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", width: "100%" }}>
           {[
-            { label: "FAQs", tab: "faqs", ref: faqRef, bg: T.bg },
-            { label: "Preferred Suppliers", tab: "suppliers", ref: suppliersRef, bg: "#dedad3" },
-            { label: "Resources", tab: "resources", ref: resourcesRef, bg: "#d2cdc6" },
+            { label: "FAQs", tab: "faqs", ref: faqRef, bg: "#f5f5f3" },
+            { label: "Preferred Suppliers", tab: "suppliers", ref: suppliersRef, bg: "#efefed" },
+            { label: "Resources", tab: "resources", ref: resourcesRef, bg: "#e6e6e4" },
           ].map(t => (
             <button key={t.tab} onClick={() => scrollTo(t.ref, t.tab)} style={{
               flex: 1, fontFamily: T.fontSans, fontSize: 14,
@@ -385,7 +385,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
       </div>
 
       {/* ── Preferred Suppliers Section ── */}
-      <div ref={suppliersRef} style={{ background: "#dedad3" }}>
+      <div ref={suppliersRef} style={{ background: "#efefed" }}>
         {/* Banner image - content width */}
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 0" }}>
           <div style={{ width: "100%", height: 220, overflow: "hidden", position: "relative", borderRadius: 8 }}>
@@ -434,7 +434,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
       </div>
 
       {/* ── Resources Section ── */}
-      <div ref={resourcesRef} style={{ background: "#d2cdc6" }}>
+      <div ref={resourcesRef} style={{ background: "#e6e6e4" }}>
         {/* Banner image - content width */}
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 0" }}>
           <div style={{ width: "100%", height: 220, overflow: "hidden", position: "relative", borderRadius: 8 }}>
