@@ -773,7 +773,7 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
 
         {/* ── FAQs Tab ── */}
         {activeTab === "faqs" && (<>
-          <h1 style={{ fontFamily: T.fontSans, fontSize: 32, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 8 }}>FAQ Manager</h1>
+          <h1 style={{ fontFamily: T.fontSans, fontSize: 32, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 8 }}>Creative Processes</h1>
           <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 28 }}>
             Add, edit, reorder and delete creative process entries. Changes appear on the public site immediately.
           </p>
@@ -851,7 +851,7 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
 
         {/* ── Suppliers Tab ── */}
         {activeTab === "suppliers" && (<>
-          <h1 style={{ fontFamily: T.fontSans, fontSize: 32, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 8 }}>Supplier Manager</h1>
+          <h1 style={{ fontFamily: T.fontSans, fontSize: 32, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 8 }}>Preferred Suppliers</h1>
           <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 28 }}>
             Add, edit and remove preferred suppliers. Changes appear on the public site immediately.
           </p>
