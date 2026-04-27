@@ -611,7 +611,7 @@ function AdminLogin({ onLogin, onBack }) {
       <style>{`* { box-sizing: border-box; margin: 0; padding: 0; }`}</style>
       <div style={{ width: "100%", maxWidth: 360 }}>
         {/* Brand */}
-        <img src={LOGO_SRC} alt="PG Create" style={{ height: 72, width: "auto", marginBottom: 32, filter: "brightness(0)" }} />
+        <img src={LOGO_SRC} alt="PG Create" style={{ height: 72, width: "auto", marginBottom: 12, filter: "brightness(0)" }} />
 
         <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, padding: 28 }}>
           <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>RESTRICTED</p>
@@ -742,7 +742,7 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
       <div style={{ background: T.bg, padding: "0 20px", borderBottom: `1px solid ${T.border}` }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 56 }}>
-            <span style={{ fontFamily: T.fontSans, fontSize: 20, fontWeight: 600, color: T.text, letterSpacing: "-0.3px" }}>PG Create</span>
+            <img src={LOGO_SRC} alt="PG Create" style={{ height: 64, width: "auto", filter: "brightness(0)" }} />
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
               <button onClick={onViewSite} style={{ fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, background: "none", border: `1px solid ${T.border}`, borderRadius: 4, padding: "5px 12px", cursor: "pointer" }}>
                 ↗ View site
