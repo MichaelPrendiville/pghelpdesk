@@ -499,13 +499,24 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
 
           {/* Contact */}
           <div style={{ flex: "1 1 200px" }}>
-            <p style={{ fontFamily: T.fontMono, fontSize: 10, color: "rgba(255,255,255,0.35)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 20 }}>Contact</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <a href="https://www.prendiville.com.au" target="_blank" rel="noreferrer" style={{ fontFamily: T.fontSans, fontSize: 14, color: "rgba(255,255,255,0.6)", textDecoration: "none" }}
-                onMouseEnter={e => e.currentTarget.style.color = "#ffffff"}
-                onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.6)"}>
-                prendiville.com.au ↗
-              </a>
+            <p style={{ fontFamily: T.fontMono, fontSize: 10, color: "rgba(255,255,255,0.35)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 20 }}>For More Information</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div>
+                <p style={{ fontFamily: T.fontSans, fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 4 }}>Head of Marketing</p>
+                <a href="mailto:molly@prendiville.com.au" style={{ fontFamily: T.fontSans, fontSize: 14, color: "rgba(255,255,255,0.7)", textDecoration: "none" }}
+                  onMouseEnter={e => e.currentTarget.style.color = "#ffffff"}
+                  onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.7)"}>
+                  molly@prendiville.com.au
+                </a>
+              </div>
+              <div>
+                <p style={{ fontFamily: T.fontSans, fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 4 }}>Creative Director</p>
+                <a href="mailto:michael@prendiville.com.au" style={{ fontFamily: T.fontSans, fontSize: 14, color: "rgba(255,255,255,0.7)", textDecoration: "none" }}
+                  onMouseEnter={e => e.currentTarget.style.color = "#ffffff"}
+                  onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.7)"}>
+                  michael@prendiville.com.au
+                </a>
+              </div>
             </div>
           </div>
         </div>
