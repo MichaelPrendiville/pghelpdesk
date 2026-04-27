@@ -191,7 +191,7 @@ function SupplierItem({ supplier, index }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // PUBLIC SITE (single scrolling page)
 // ═══════════════════════════════════════════════════════════════════════════════
-function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, resourcesBanner }) {
+function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, resourcesBanner, heroLogo, heroImage }) {
   const [activeTab, setActiveTab] = useState("faqs");
   const [query, setQuery] = useState("");
   const [topic, setTopic] = useState("All Topics");
@@ -268,7 +268,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
 
       {/* ── Hero ── */}
       <div style={{ width: "100%", height: "100vh", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-        <img src={HERO_SRC} alt="Hero" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
+        <img src={heroImage || HERO_SRC} alt="Hero" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,10,10,0.6) 0%, rgba(10,10,10,0.35) 50%, rgba(10,10,10,0.7) 100%)" }} />
 
         {/* Top bar — hamburger left, logo centre, admin right */}
@@ -281,7 +281,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
           </button>
 
           {/* Logo — centre */}
-          <img src={LOGO_SRC} alt="PG Create" style={{ height: 48, width: "auto", position: "absolute", left: "50%", transform: "translateX(-50%)" }} />
+          <img src={heroLogo || LOGO_SRC} alt="PG Create" style={{ height: 64, width: "auto", position: "absolute", left: "50%", transform: "translateX(-50%)" }} />
 
           {/* Admin icon — right */}
           <button onClick={onGoAdmin} style={{ background: "none", border: "none", cursor: "pointer", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32 }}>
@@ -468,13 +468,61 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
               ))}
             </div>
           )}
-
-          {/* Footer admin link */}
-          <div style={{ textAlign: "center", marginTop: 64, paddingTop: 24, borderTop: `1px solid ${T.border}` }}>
-            <button onClick={onGoAdmin} style={{ fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, background: "none", border: `1px solid ${T.border}`, borderRadius: 4, padding: "8px 20px", cursor: "pointer" }}>Admin login</button>
-          </div>
         </div>
       </div>
+
+      {/* ── Footer ── */}
+      <footer style={{ background: "#1a1a1a", color: "#ffffff" }}>
+        {/* Top footer */}
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "56px 20px 40px", display: "flex", flexWrap: "wrap", gap: 48, justifyContent: "space-between" }}>
+          {/* Logo + tagline */}
+          <div style={{ flex: "1 1 260px" }}>
+            <img src={heroLogo || LOGO_SRC} alt="PG Create" style={{ height: 40, width: "auto", marginBottom: 20 }} />
+            <p style={{ fontFamily: T.fontSans, fontSize: 14, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, maxWidth: 280 }}>
+              Your guide to Prendiville Group Creative — FAQs, preferred suppliers and resources.
+            </p>
+          </div>
+
+          {/* Quick links */}
+          <div style={{ flex: "1 1 160px" }}>
+            <p style={{ fontFamily: T.fontMono, fontSize: 10, color: "rgba(255,255,255,0.35)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 20 }}>Navigate</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {[{ label: "FAQs", tab: "faqs", ref: faqRef }, { label: "Preferred Suppliers", tab: "suppliers", ref: suppliersRef }, { label: "Resources", tab: "resources", ref: resourcesRef }].map(item => (
+                <button key={item.label} onClick={() => scrollTo(item.ref, item.tab)} style={{ fontFamily: T.fontSans, fontSize: 14, color: "rgba(255,255,255,0.6)", background: "none", border: "none", cursor: "pointer", textAlign: "left", padding: 0, transition: "color 0.15s" }}
+                  onMouseEnter={e => e.currentTarget.style.color = "#ffffff"}
+                  onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.6)"}>
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Contact */}
+          <div style={{ flex: "1 1 200px" }}>
+            <p style={{ fontFamily: T.fontMono, fontSize: 10, color: "rgba(255,255,255,0.35)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 20 }}>Contact</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <a href="https://www.prendiville.com.au" target="_blank" rel="noreferrer" style={{ fontFamily: T.fontSans, fontSize: 14, color: "rgba(255,255,255,0.6)", textDecoration: "none" }}
+                onMouseEnter={e => e.currentTarget.style.color = "#ffffff"}
+                onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.6)"}>
+                prendiville.com.au ↗
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }} />
+
+        {/* Bottom bar */}
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "20px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+          <p style={{ fontFamily: T.fontSans, fontSize: 12, color: "rgba(255,255,255,0.3)", margin: 0 }}>
+            © {new Date().getFullYear()} Prendiville Group. All rights reserved.
+          </p>
+          <button onClick={onGoAdmin} style={{ fontFamily: T.fontSans, fontSize: 12, color: "rgba(255,255,255,0.25)", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+            Admin login
+          </button>
+        </div>
+      </footer>
     </div>
   );
 }
@@ -551,7 +599,7 @@ function AdminLogin({ onLogin, onBack }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // ADMIN CMS
 // ═══════════════════════════════════════════════════════════════════════════════
-function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppliersBanner, resourcesBanner, setResourcesBanner, onLogout, onViewSite }) {
+function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppliersBanner, resourcesBanner, setResourcesBanner, heroLogo, setHeroLogo, heroImage, setHeroImage, onLogout, onViewSite }) {
   const { addFaq, updateFaq, deleteFaq: dbDeleteFaq, reorderFaqs, addSupplier, updateSupplier, deleteSupplier: dbDeleteSupplier, addResource, updateResource, deleteResource } = dbOps;
   const [activeTab, setActiveTab] = useState("faqs");
 
@@ -903,7 +951,59 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
         </p>
         <div style={{ borderTop: `1px solid ${T.border}`, marginBottom: 28 }} />
 
-        {/* Suppliers banner */}
+        {/* Hero Logo */}
+        <div style={{ marginBottom: 36 }}>
+          <p style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Header Logo</p>
+          {heroLogo && (
+            <div style={{ position: "relative", marginBottom: 12, background: "#222", borderRadius: 6, padding: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <img src={heroLogo} alt="Hero logo" style={{ height: 64, width: "auto", maxWidth: "100%" }} />
+              <button onClick={() => setHeroLogo(null)} style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,0.5)", color: "#fff", border: "none", borderRadius: 4, padding: "4px 10px", fontFamily: T.fontSans, fontSize: 12, cursor: "pointer" }}>Remove</button>
+            </div>
+          )}
+          <label style={{ display: "block", cursor: "pointer" }}>
+            <div style={{ border: `2px dashed ${T.border}`, borderRadius: 8, padding: "20px", textAlign: "center" }}>
+              <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted }}>{heroLogo ? "Click to replace logo" : "Click to upload logo"}</p>
+              <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, marginTop: 4 }}>PNG with transparent background recommended</p>
+            </div>
+            <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => {
+              const file = e.target.files[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = ev => setHeroLogo(ev.target.result);
+              reader.readAsDataURL(file);
+              e.target.value = "";
+            }} />
+          </label>
+        </div>
+
+        <div style={{ borderTop: `1px solid ${T.border}`, marginBottom: 28 }} />
+
+        {/* Hero Image */}
+        <div style={{ marginBottom: 36 }}>
+          <p style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Header Image</p>
+          {heroImage && (
+            <div style={{ position: "relative", marginBottom: 12 }}>
+              <img src={heroImage} alt="Hero" style={{ width: "100%", height: 140, objectFit: "cover", borderRadius: 6 }} />
+              <button onClick={() => setHeroImage(null)} style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,0.5)", color: "#fff", border: "none", borderRadius: 4, padding: "4px 10px", fontFamily: T.fontSans, fontSize: 12, cursor: "pointer" }}>Remove</button>
+            </div>
+          )}
+          <label style={{ display: "block", cursor: "pointer" }}>
+            <div style={{ border: `2px dashed ${T.border}`, borderRadius: 8, padding: "20px", textAlign: "center" }}>
+              <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted }}>{heroImage ? "Click to replace image" : "Click to upload image"}</p>
+              <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, marginTop: 4 }}>JPG · PNG · WEBP</p>
+            </div>
+            <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => {
+              const file = e.target.files[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = ev => setHeroImage(ev.target.result);
+              reader.readAsDataURL(file);
+              e.target.value = "";
+            }} />
+          </label>
+        </div>
+
+        <div style={{ borderTop: `1px solid ${T.border}`, marginBottom: 28 }} />
         <div style={{ marginBottom: 36 }}>
           <p style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Preferred Suppliers Banner</p>
           {suppliersBanner && (
@@ -978,6 +1078,8 @@ export default function App() {
   const [view, setView] = useState("public");
   const [loading, setLoading] = useState(true);
   const [suppliersBanner, setSuppliersBanner] = useState(null);
+  const [heroLogo, setHeroLogo] = useState(null);
+  const [heroImage, setHeroImage] = useState(null);
   const [resourcesBanner, setResourcesBanner] = useState(null);
 
   // Load all data from Supabase on mount
@@ -987,7 +1089,7 @@ export default function App() {
         sbFetch("faqs", { query: "?order=sort_order.asc,id.asc" }),
         sbFetch("suppliers", { query: "?order=id.asc" }),
         sbFetch("resources", { query: "?order=id.asc" }),
-        sbFetch("settings", { query: "?key=in.(suppliers_banner,resources_banner)" }),
+        sbFetch("settings", { query: "?key=in.(suppliers_banner,resources_banner,hero_logo,hero_image)" }),
       ]);
       if (f) setFaqs(f);
       if (s) setSuppliers(s);
@@ -997,6 +1099,10 @@ export default function App() {
         const rb = settings.find(x => x.key === "resources_banner");
         if (sb?.value) setSuppliersBanner(sb.value);
         if (rb?.value) setResourcesBanner(rb.value);
+        const hl = settings.find(x => x.key === "hero_logo");
+        if (hl?.value) setHeroLogo(hl.value);
+        const hi = settings.find(x => x.key === "hero_image");
+        if (hi?.value) setHeroImage(hi.value);
       }
       setLoading(false);
     }
@@ -1034,6 +1140,34 @@ export default function App() {
         "Prefer": "resolution=merge-duplicates",
       },
       body: JSON.stringify({ key: "resources_banner", value: value || "" }),
+    });
+  }
+
+  async function saveHeroLogo(value) {
+    setHeroLogo(value);
+    await fetch(`${SUPABASE_URL}/rest/v1/settings`, {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        "Prefer": "resolution=merge-duplicates",
+      },
+      body: JSON.stringify({ key: "hero_logo", value: value || "" }),
+    });
+  }
+
+  async function saveHeroImage(value) {
+    setHeroImage(value);
+    await fetch(`${SUPABASE_URL}/rest/v1/settings`, {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        "Prefer": "resolution=merge-duplicates",
+      },
+      body: JSON.stringify({ key: "hero_image", value: value || "" }),
     });
   }
 
@@ -1093,9 +1227,9 @@ export default function App() {
 
   return (
     <>
-      {view === "public" && <PublicSite faqs={faqs} suppliers={suppliers} resources={resources} onGoAdmin={() => setView("login")} suppliersBanner={suppliersBanner} resourcesBanner={resourcesBanner} />}
+      {view === "public" && <PublicSite faqs={faqs} suppliers={suppliers} resources={resources} onGoAdmin={() => setView("login")} suppliersBanner={suppliersBanner} resourcesBanner={resourcesBanner} heroLogo={heroLogo} heroImage={heroImage} />}
       {view === "login" && <AdminLogin onLogin={() => setView("admin")} onBack={() => setView("public")} />}
-      {view === "admin" && <AdminCMS faqs={faqs} suppliers={suppliers} resources={resources} dbOps={dbOps} suppliersBanner={suppliersBanner} setSuppliersBanner={saveSuppliersBanner} resourcesBanner={resourcesBanner} setResourcesBanner={saveResourcesBanner} onLogout={() => setView("public")} onViewSite={() => setView("public")} />}
+      {view === "admin" && <AdminCMS faqs={faqs} suppliers={suppliers} resources={resources} dbOps={dbOps} suppliersBanner={suppliersBanner} setSuppliersBanner={saveSuppliersBanner} resourcesBanner={resourcesBanner} setResourcesBanner={saveResourcesBanner} heroLogo={heroLogo} setHeroLogo={saveHeroLogo} heroImage={heroImage} setHeroImage={saveHeroImage} onLogout={() => setView("public")} onViewSite={() => setView("public")} />}
     </>
   );
 }
