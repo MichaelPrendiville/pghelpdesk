@@ -200,10 +200,20 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
   const [category, setCategory] = useState("All Categories");
   const [supplierSearch, setSupplierSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const faqRef = useRef(null);
   const suppliersRef = useRef(null);
   const resourcesRef = useRef(null);
+
+  // Show sticky nav once user scrolls past the hero
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > window.innerHeight * 0.8);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Track active tab by scroll position (reliable fallback)
   useEffect(() => {
@@ -315,28 +325,38 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
         </div>
       </div>
 
-      {/* ── Sticky tab bar ── */}
-      <div style={{ borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 10, display: "flex" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", width: "100%" }}>
-          {[
-            { label: "Creative Processes", tab: "faqs", ref: faqRef, bg: "#f5f5f3" },
-            { label: "Preferred Suppliers", tab: "suppliers", ref: suppliersRef, bg: "#efefed" },
-            { label: "Resources", tab: "resources", ref: resourcesRef, bg: "#e6e6e4" },
-          ].map(t => (
-            <button key={t.tab} onClick={() => scrollTo(t.ref, t.tab)} style={{
-              flex: 1, fontFamily: T.fontSans, fontSize: 14,
-              color: activeTab === t.tab ? T.text : T.textMuted,
-              fontWeight: activeTab === t.tab ? 500 : 400,
-              background: t.bg,
-              border: "none",
-              borderBottom: activeTab === t.tab ? `2px solid ${T.text}` : "2px solid transparent",
-              padding: "0 8px", height: 52, cursor: "pointer", transition: "all 0.15s",
-            }}>
-              {t.label}
+      {/* ── Sticky nav (appears on scroll) ── */}
+      {scrolled && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: "rgba(255,255,255,0.96)", backdropFilter: "blur(12px)", borderBottom: `1px solid ${T.border}`, animation: "fadeUp 0.2s ease" }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56 }}>
+            {/* Hamburger */}
+            <button onClick={e => { e.stopPropagation(); setMenuOpen(o => !o); }} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", gap: 5, padding: 4 }}>
+              <span style={{ display: "block", width: 22, height: 1.5, background: T.text }} />
+              <span style={{ display: "block", width: 22, height: 1.5, background: T.text }} />
+              <span style={{ display: "block", width: 22, height: 1.5, background: T.text }} />
             </button>
-          ))}
+            {/* Logo */}
+            <img src={heroLogo || LOGO_SRC} alt="PG Create" style={{ height: 28, width: "auto", filter: "brightness(0)" }} />
+            {/* Admin icon */}
+            <button onClick={onGoAdmin} style={{ background: "none", border: "none", cursor: "pointer", color: T.text, display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32 }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+              </svg>
+            </button>
+          </div>
+          {/* Sticky nav menu dropdown */}
+          {menuOpen && (
+            <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 56, left: 20, background: T.text, borderRadius: 8, overflow: "hidden", animation: "fadeUp 0.15s ease", minWidth: 220, zIndex: 100, boxShadow: "0 8px 32px rgba(0,0,0,0.15)" }}>
+              {[{ label: "Creative Processes", ref: faqRef, tab: "faqs" }, { label: "Preferred Suppliers", ref: suppliersRef, tab: "suppliers" }, { label: "Resources", ref: resourcesRef, tab: "resources" }].map((item, i, arr) => (
+                <button key={item.label} onClick={() => scrollTo(item.ref, item.tab)} style={{ display: "block", width: "100%", textAlign: "left", padding: "14px 20px", fontFamily: T.fontSans, fontSize: 14, color: "#ffffff", background: "none", border: "none", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.1)" : "none", cursor: "pointer" }}>
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
       {/* ── Intro paragraph ── */}
       <div style={{ background: T.surface, borderBottom: `1px solid ${T.border}` }}>
