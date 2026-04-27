@@ -191,7 +191,7 @@ function SupplierItem({ supplier, index }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // PUBLIC SITE (single scrolling page)
 // ═══════════════════════════════════════════════════════════════════════════════
-function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, resourcesBanner, heroLogo, heroImage }) {
+function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, resourcesBanner, heroLogo, heroImage, faqsBanner }) {
   const [activeTab, setActiveTab] = useState("faqs");
   const [query, setQuery] = useState("");
   const [topic, setTopic] = useState("All Topics");
@@ -338,9 +338,25 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
         </div>
       </div>
 
+      {/* ── Intro paragraph ── */}
+      <div style={{ background: T.surface, borderBottom: `1px solid ${T.border}` }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 20px" }}>
+          <p style={{ fontFamily: T.fontSans, fontSize: "clamp(1.05rem, 2vw, 1.25rem)", fontWeight: 500, color: T.text, lineHeight: 1.7, maxWidth: 860 }}>
+            This website brings together the foundations of the Prendiville Group Creative, with clear creative processes, trusted preferred suppliers, and practical resource documents in one place. It's designed to inspire confident decision-making and ensure each brand experience is delivered with consistency, clarity, and impact.
+          </p>
+        </div>
+      </div>
+
       {/* ── FAQs Section ── */}
-      <div ref={faqRef} style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 20px 80px" }} onClick={() => setDropdownOpen(false)}>
-        <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 8 }}>Creative Processes</h2>
+      <div ref={faqRef} style={{ background: T.bg }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 20px 0" }} onClick={() => setDropdownOpen(false)}>
+          <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 24 }}>Creative Processes</h2>
+          <div style={{ width: "100%", height: 220, overflow: "hidden", position: "relative", borderRadius: 8 }}>
+            <img src={faqsBanner ? faqsBanner : HERO_SRC} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block", backgroundColor: "#b0a898" }} />
+            <div style={{ position: "absolute", inset: 0, background: "rgba(20,16,12,0.25)" }} />
+          </div>
+        </div>
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 80px" }} onClick={() => setDropdownOpen(false)}>
         <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 24 }}>
           The following Creative Processes have been developed to provide clear guidance on how marketing, branding, and design requests are managed across the group. It outlines key responsibilities, communication pathways, and approval processes to ensure consistency, efficiency, and high-quality output at every stage.
         </p>
@@ -383,6 +399,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
             </div>
           )}
           {faqFiltered.map((faq, i) => <AccordionItem key={faq.id} faq={faq} index={i} />)}
+        </div>
         </div>
       </div>
 
@@ -606,7 +623,7 @@ function AdminLogin({ onLogin, onBack }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // ADMIN CMS
 // ═══════════════════════════════════════════════════════════════════════════════
-function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppliersBanner, resourcesBanner, setResourcesBanner, heroLogo, setHeroLogo, heroImage, setHeroImage, onLogout, onViewSite }) {
+function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppliersBanner, resourcesBanner, setResourcesBanner, heroLogo, setHeroLogo, heroImage, setHeroImage, faqsBanner, setFaqsBanner, onLogout, onViewSite }) {
   const { addFaq, updateFaq, deleteFaq: dbDeleteFaq, reorderFaqs, addSupplier, updateSupplier, deleteSupplier: dbDeleteSupplier, addResource, updateResource, deleteResource } = dbOps;
   const [activeTab, setActiveTab] = useState("faqs");
 
@@ -1010,6 +1027,33 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
           </label>
         </div>
 
+
+        <div style={{ borderTop: `1px solid ${T.border}`, marginBottom: 28 }} />
+        {/* Creative Processes banner */}
+        <div style={{ marginBottom: 36 }}>
+          <p style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Creative Processes Banner</p>
+          {faqsBanner && (
+            <div style={{ position: "relative", marginBottom: 12 }}>
+              <img src={faqsBanner} alt="Creative Processes banner" style={{ width: "100%", height: 140, objectFit: "cover", borderRadius: 6 }} />
+              <button onClick={() => setFaqsBanner(null)} style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,0.5)", color: "#fff", border: "none", borderRadius: 4, padding: "4px 10px", fontFamily: T.fontSans, fontSize: 12, cursor: "pointer" }}>Remove</button>
+            </div>
+          )}
+          <label style={{ display: "block", cursor: "pointer" }}>
+            <div style={{ border: `2px dashed ${T.border}`, borderRadius: 8, padding: "20px", textAlign: "center" }}>
+              <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted }}>{faqsBanner ? "Click to replace image" : "Click to upload image"}</p>
+              <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, marginTop: 4 }}>JPG · PNG · WEBP</p>
+            </div>
+            <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => {
+              const file = e.target.files[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = ev => setFaqsBanner(ev.target.result);
+              reader.readAsDataURL(file);
+              e.target.value = "";
+            }} />
+          </label>
+        </div>
+
         <div style={{ borderTop: `1px solid ${T.border}`, marginBottom: 28 }} />
         <div style={{ marginBottom: 36 }}>
           <p style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Preferred Suppliers Banner</p>
@@ -1087,6 +1131,7 @@ export default function App() {
   const [suppliersBanner, setSuppliersBanner] = useState(null);
   const [heroLogo, setHeroLogo] = useState(null);
   const [heroImage, setHeroImage] = useState(null);
+  const [faqsBanner, setFaqsBanner] = useState(null);
   const [resourcesBanner, setResourcesBanner] = useState(null);
 
   // Load all data from Supabase on mount
@@ -1096,7 +1141,7 @@ export default function App() {
         sbFetch("faqs", { query: "?order=sort_order.asc,id.asc" }),
         sbFetch("suppliers", { query: "?order=id.asc" }),
         sbFetch("resources", { query: "?order=id.asc" }),
-        sbFetch("settings", { query: "?key=in.(suppliers_banner,resources_banner,hero_logo,hero_image)" }),
+        sbFetch("settings", { query: "?key=in.(suppliers_banner,resources_banner,hero_logo,hero_image,faqs_banner)" }),
       ]);
       if (f) setFaqs(f);
       if (s) setSuppliers(s);
@@ -1110,6 +1155,8 @@ export default function App() {
         if (hl?.value) setHeroLogo(hl.value);
         const hi = settings.find(x => x.key === "hero_image");
         if (hi?.value) setHeroImage(hi.value);
+        const fb = settings.find(x => x.key === "faqs_banner");
+        if (fb?.value) setFaqsBanner(fb.value);
       }
       setLoading(false);
     }
@@ -1147,6 +1194,20 @@ export default function App() {
         "Prefer": "resolution=merge-duplicates",
       },
       body: JSON.stringify({ key: "resources_banner", value: value || "" }),
+    });
+  }
+
+  async function saveFaqsBanner(value) {
+    setFaqsBanner(value);
+    await fetch(`${SUPABASE_URL}/rest/v1/settings`, {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        "Prefer": "resolution=merge-duplicates",
+      },
+      body: JSON.stringify({ key: "faqs_banner", value: value || "" }),
     });
   }
 
@@ -1234,9 +1295,9 @@ export default function App() {
 
   return (
     <>
-      {view === "public" && <PublicSite faqs={faqs} suppliers={suppliers} resources={resources} onGoAdmin={() => setView("login")} suppliersBanner={suppliersBanner} resourcesBanner={resourcesBanner} heroLogo={heroLogo} heroImage={heroImage} />}
+      {view === "public" && <PublicSite faqs={faqs} suppliers={suppliers} resources={resources} onGoAdmin={() => setView("login")} suppliersBanner={suppliersBanner} resourcesBanner={resourcesBanner} heroLogo={heroLogo} heroImage={heroImage} faqsBanner={faqsBanner} />}
       {view === "login" && <AdminLogin onLogin={() => setView("admin")} onBack={() => setView("public")} />}
-      {view === "admin" && <AdminCMS faqs={faqs} suppliers={suppliers} resources={resources} dbOps={dbOps} suppliersBanner={suppliersBanner} setSuppliersBanner={saveSuppliersBanner} resourcesBanner={resourcesBanner} setResourcesBanner={saveResourcesBanner} heroLogo={heroLogo} setHeroLogo={saveHeroLogo} heroImage={heroImage} setHeroImage={saveHeroImage} onLogout={() => setView("public")} onViewSite={() => setView("public")} />}
+      {view === "admin" && <AdminCMS faqs={faqs} suppliers={suppliers} resources={resources} dbOps={dbOps} suppliersBanner={suppliersBanner} setSuppliersBanner={saveSuppliersBanner} resourcesBanner={resourcesBanner} setResourcesBanner={saveResourcesBanner} heroLogo={heroLogo} setHeroLogo={saveHeroLogo} heroImage={heroImage} setHeroImage={saveHeroImage} faqsBanner={faqsBanner} setFaqsBanner={saveFaqsBanner} onLogout={() => setView("public")} onViewSite={() => setView("public")} />}
     </>
   );
 }
