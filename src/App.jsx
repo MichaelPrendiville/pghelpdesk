@@ -174,6 +174,12 @@ function SupplierItem({ supplier, index }) {
               </button>
             </div>
           )}
+          {supplier.notes && (
+            <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginTop: 4 }}>
+              <span style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", minWidth: 64, paddingTop: 2 }}>Notes</span>
+              <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, lineHeight: 1.6, margin: 0 }}>{supplier.notes}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -228,7 +234,10 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
   const categories = ["All Categories", ...Array.from(new Set(suppliers.map(s => s.category).filter(Boolean)))];
   const suppliersFiltered = suppliers.filter(s => {
     const matchesCat = category === "All Categories" || s.category === category;
-    const matchesSearch = !supplierSearch || s.business.toLowerCase().includes(supplierSearch.toLowerCase()) || (s.contact || "").toLowerCase().includes(supplierSearch.toLowerCase());
+    const matchesSearch = !supplierSearch || 
+      s.business.toLowerCase().includes(supplierSearch.toLowerCase()) || 
+      (s.contact || "").toLowerCase().includes(supplierSearch.toLowerCase()) ||
+      (s.notes || "").toLowerCase().includes(supplierSearch.toLowerCase());
     return matchesCat && matchesSearch;
   });
 
@@ -556,7 +565,7 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
 
   // Supplier state
   const [editingSupplier, setEditingSupplier] = useState(null);
-  const [supplierForm, setSupplierForm] = useState({ business: "", contact: "", email: "", phone: "", mobile: "", category: "" });
+  const [supplierForm, setSupplierForm] = useState({ business: "", contact: "", email: "", phone: "", mobile: "", category: "", notes: "" });
   const [supplierQuery, setSupplierQuery] = useState("");
   const filteredSuppliers = supplierQuery
     ? suppliers.filter(s => s.business.toLowerCase().includes(supplierQuery.toLowerCase()) || (s.category || "").toLowerCase().includes(supplierQuery.toLowerCase()))
@@ -585,9 +594,9 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
   }
 
   // Supplier functions
-  function startEditSupplier(s) { setEditingSupplier(s.id); setSupplierForm({ business: s.business, contact: s.contact || "", email: s.email || "", phone: s.phone || "", mobile: s.mobile || "", category: s.category || "" }); }
-  function startNewSupplier() { setEditingSupplier("new"); setSupplierForm({ business: "", contact: "", email: "", phone: "", mobile: "", category: "" }); }
-  function cancelEditSupplier() { setEditingSupplier(null); setSupplierForm({ business: "", contact: "", email: "", phone: "", mobile: "", category: "" }); }
+  function startEditSupplier(s) { setEditingSupplier(s.id); setSupplierForm({ business: s.business, contact: s.contact || "", email: s.email || "", phone: s.phone || "", mobile: s.mobile || "", category: s.category || "", notes: s.notes || "" }); }
+  function startNewSupplier() { setEditingSupplier("new"); setSupplierForm({ business: "", contact: "", email: "", phone: "", mobile: "", category: "", notes: "" }); }
+  function cancelEditSupplier() { setEditingSupplier(null); setSupplierForm({ business: "", contact: "", email: "", phone: "", mobile: "", category: "", notes: "" }); }
   async function saveSupplier() {
     if (!supplierForm.business.trim()) return;
     if (editingSupplier === "new") { await addSupplier(supplierForm); showToast("Supplier added"); }
@@ -773,6 +782,10 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
               <label style={{ display: "block", marginBottom: 16 }}>
                 <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Email</span>
                 <input value={supplierForm.email} onChange={e => setSupplierForm(f => ({ ...f, email: e.target.value }))} placeholder="email@example.com" style={fieldStyle} />
+              </label>
+              <label style={{ display: "block", marginBottom: 16 }}>
+                <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Notes / Specialisation</span>
+                <textarea value={supplierForm.notes} onChange={e => setSupplierForm(f => ({ ...f, notes: e.target.value }))} placeholder="What do they specialise in?" rows={3} style={{ ...fieldStyle, resize: "vertical" }} />
               </label>
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={saveSupplier} style={{ background: T.text, color: T.bg, border: "none", borderRadius: 4, padding: "8px 18px", fontFamily: T.fontSans, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
