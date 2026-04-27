@@ -932,8 +932,14 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
                 onDragOver={e => { e.preventDefault(); setSupplierOverIdx(i); }}
                 onDrop={() => {
                   if (supplierDragIdx === null || supplierDragIdx === i) return;
-                  const arr = [...filteredSuppliers]; const [m] = arr.splice(supplierDragIdx, 1); arr.splice(i, 0, m);
-                  reorderSuppliers(arr); setSupplierDragIdx(null); setSupplierOverIdx(null); showToast("Order updated");
+                  const arr = [...filteredSuppliers];
+                  const [moved] = arr.splice(supplierDragIdx, 1);
+                  arr.splice(i, 0, moved);
+                  // Merge back into full suppliers list preserving non-filtered items
+                  const filtered_ids = new Set(filteredSuppliers.map(x => x.id));
+                  const others = suppliers.filter(x => !filtered_ids.has(x.id));
+                  reorderSuppliers([...arr, ...others]);
+                  setSupplierDragIdx(null); setSupplierOverIdx(null); showToast("Order updated");
                 }}
                 onDragEnd={() => { setSupplierDragIdx(null); setSupplierOverIdx(null); }}
                 style={{ padding: "14px 22px", borderBottom: i < filteredSuppliers.length - 1 ? `1px solid ${T.border}` : "none", display: "flex", alignItems: "center", gap: 12, background: supplierOverIdx === i ? "#f4f4f2" : editingSupplier === s.id ? "#fafaf8" : T.surface, transition: "background 0.15s" }}>
@@ -1032,10 +1038,6 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
           ) : (
             <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, overflow: "hidden" }}>
               {resources.map((r, i) => {
-                const ext = r.name.split(".").pop().toUpperCase();
-                const icons = { PDF: "📄", DOCX: "📄", DOC: "📄", XLSX: "📊", XLS: "📊" };
-                const icon = icons[ext] || "📎";
-                const sizeFmt = r.size < 1048576 ? (r.size / 1024).toFixed(1) + " KB" : (r.size / 1048576).toFixed(1) + " MB";
                 return (
                   <div key={r.id}
                     draggable
@@ -1045,17 +1047,15 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
                       if (resourceDragIdx === null || resourceDragIdx === i) return;
                       const arr = [...resources]; const [m] = arr.splice(resourceDragIdx, 1); arr.splice(i, 0, m);
                       reorderResources(arr); setResourceDragIdx(null); setResourceOverIdx(null); showToast("Order updated");
-                    }}                    onDragEnd={() => { setResourceDragIdx(null); setResourceOverIdx(null); }}
+                    }}
+                    onDragEnd={() => { setResourceDragIdx(null); setResourceOverIdx(null); }}
                     style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 20px", borderBottom: i < resources.length - 1 ? `1px solid ${T.border}` : "none", background: resourceOverIdx === i ? "#f4f4f2" : T.surface, transition: "background 0.15s" }}>
                     <span style={{ color: T.border, fontSize: 16, cursor: "grab", userSelect: "none", flexShrink: 0 }}>⠿</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: 2 }}>{r.name}</p>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <input value={r.category} onChange={e => updateResource(r.id, { category: e.target.value })}
-                          placeholder="Add category…"
-                          style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, background: "none", border: "none", borderBottom: `1px solid ${T.border}`, outline: "none", width: 120, padding: "1px 0" }} />
-                        <span style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted }}>{sizeFmt} · {ext}</span>
-                      </div>
+                      <input value={r.category} onChange={e => updateResource(r.id, { category: e.target.value })}
+                        placeholder="Add category…"
+                        style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, background: "none", border: "none", borderBottom: `1px solid ${T.border}`, outline: "none", width: 120, padding: "1px 0" }} />
                     </div>
                     <IconBtn onClick={() => { deleteResource(r.id); showToast("File removed"); }} danger>🗑</IconBtn>
                   </div>
