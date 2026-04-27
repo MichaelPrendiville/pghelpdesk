@@ -281,7 +281,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
           </button>
 
           {/* Logo — centre */}
-          <img src={LOGO_SRC} alt="PG Create" style={{ height: 28, width: "auto", position: "absolute", left: "50%", transform: "translateX(-50%)" }} />
+          <img src={LOGO_SRC} alt="PG Create" style={{ height: 48, width: "auto", position: "absolute", left: "50%", transform: "translateX(-50%)" }} />
 
           {/* Admin icon — right */}
           <button onClick={onGoAdmin} style={{ background: "none", border: "none", cursor: "pointer", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32 }}>
@@ -349,7 +349,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
         {/* Topic dropdown + Search — side by side */}
         <div style={{ display: "flex", gap: 12, marginBottom: 24 }} onClick={e => e.stopPropagation()}>
           {/* Topic dropdown */}
-          <div style={{ position: "relative", width: 220, flexShrink: 0 }}>
+          <div style={{ position: "relative", flex: 1 }}>
             <button onClick={() => setDropdownOpen(o => !o)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", fontFamily: T.fontSans, fontSize: 13, color: T.text, background: "transparent", border: `1px solid ${T.text}`, borderRadius: 6, padding: "10px 12px", cursor: "pointer" }}>
               <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 12 }}>☰</span>{topic}</span>
               <span style={{ fontSize: 10, transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", display: "inline-block" }}>▾</span>
