@@ -383,7 +383,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
       )}
 
       {/* ── Intro paragraph ── */}
-      <div style={{ background: T.surface, borderBottom: `1px solid ${T.border}` }}>
+      <div style={{ background: T.surface }}>
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "72px 20px 80px", textAlign: "center" }}>
           <p style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textXMuted, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 24 }}>PG Create</p>
           <p style={{ fontFamily: T.fontSans, fontSize: "clamp(1.25rem, 2.5vw, 1.75rem)", fontWeight: 300, color: T.text, lineHeight: 1.65, letterSpacing: "-0.3px" }}>
