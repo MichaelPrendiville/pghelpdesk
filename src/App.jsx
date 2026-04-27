@@ -304,12 +304,23 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
 
         {/* Hamburger menu dropdown */}
         {menuOpen && (
-          <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 64, left: 16, background: "rgba(20,16,12,0.92)", backdropFilter: "blur(12px)", borderRadius: 8, overflow: "hidden", animation: "fadeUp 0.2s ease", minWidth: 220, zIndex: 100 }}>
-            {[{ label: "Creative Processes", ref: faqRef, tab: "faqs" }, { label: "Preferred Suppliers", ref: suppliersRef, tab: "suppliers" }, { label: "Resources", ref: resourcesRef, tab: "resources" }].map((item, i, arr) => (
-              <button key={item.label} onClick={() => scrollTo(item.ref, item.tab)} style={{ display: "block", width: "100%", textAlign: "left", padding: "16px 20px", fontFamily: T.fontSans, fontSize: 15, color: "#ffffff", background: "none", border: "none", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.1)" : "none", cursor: "pointer", letterSpacing: "0.02em" }}>
-                {item.label}
-              </button>
-            ))}
+          <div onClick={e => e.stopPropagation()} style={{ position: "fixed", inset: 0, background: "#ffffff", zIndex: 200, display: "flex", flexDirection: "column", padding: "100px 40px 60px", animation: "fadeUp 0.25s ease" }}>
+            {/* Close button */}
+            <button onClick={() => setMenuOpen(false)} style={{ position: "absolute", top: 28, right: 28, background: "none", border: "none", cursor: "pointer", fontSize: 24, color: T.text, lineHeight: 1 }}>×</button>
+            {/* Nav links */}
+            <nav style={{ flex: 1 }}>
+              {[{ label: "Creative Processes", ref: faqRef, tab: "faqs" }, { label: "Preferred Suppliers", ref: suppliersRef, tab: "suppliers" }, { label: "Resources", ref: resourcesRef, tab: "resources" }].map(item => (
+                <button key={item.label} onClick={() => scrollTo(item.ref, item.tab)} style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 0", fontFamily: T.fontSans, fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 300, color: T.text, background: "none", border: "none", borderBottom: `1px solid ${T.border}`, cursor: "pointer", letterSpacing: "-0.5px", lineHeight: 1.3 }}>
+                  {item.label}
+                </button>
+              ))}
+            </nav>
+            {/* Footer contact in menu */}
+            <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 32, marginTop: 32 }}>
+              <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 12 }}>For more information</p>
+              <a href="mailto:molly@prendiville.com.au" style={{ display: "block", fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, textDecoration: "none", marginBottom: 6 }}>molly@prendiville.com.au</a>
+              <a href="mailto:michael@prendiville.com.au" style={{ display: "block", fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, textDecoration: "none" }}>michael@prendiville.com.au</a>
+            </div>
           </div>
         )}
 
@@ -328,7 +339,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
       {/* ── Sticky nav (appears on scroll) ── */}
       {scrolled && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: "rgba(255,255,255,0.96)", backdropFilter: "blur(12px)", borderBottom: `1px solid ${T.border}`, animation: "fadeUp 0.2s ease" }}>
-          <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 72 }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 84 }}>
             {/* Hamburger */}
             <button onClick={e => { e.stopPropagation(); setMenuOpen(o => !o); }} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", gap: 5, padding: 4 }}>
               <span style={{ display: "block", width: 22, height: 1.5, background: T.text }} />
@@ -336,7 +347,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
               <span style={{ display: "block", width: 22, height: 1.5, background: T.text }} />
             </button>
             {/* Logo */}
-            <img src={heroLogo || LOGO_SRC} alt="PG Create" style={{ height: 40, width: "auto", filter: "brightness(0)" }} />
+            <img src={heroLogo || LOGO_SRC} alt="PG Create" style={{ height: 64, width: "auto", filter: "brightness(0)" }} />
             {/* Admin icon */}
             <button onClick={onGoAdmin} style={{ background: "none", border: "none", cursor: "pointer", color: T.text, display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32 }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -347,12 +358,20 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
           </div>
           {/* Sticky nav menu dropdown */}
           {menuOpen && (
-            <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 72, left: 20, background: T.text, borderRadius: 8, overflow: "hidden", animation: "fadeUp 0.15s ease", minWidth: 220, zIndex: 100, boxShadow: "0 8px 32px rgba(0,0,0,0.15)" }}>
-              {[{ label: "Creative Processes", ref: faqRef, tab: "faqs" }, { label: "Preferred Suppliers", ref: suppliersRef, tab: "suppliers" }, { label: "Resources", ref: resourcesRef, tab: "resources" }].map((item, i, arr) => (
-                <button key={item.label} onClick={() => scrollTo(item.ref, item.tab)} style={{ display: "block", width: "100%", textAlign: "left", padding: "14px 20px", fontFamily: T.fontSans, fontSize: 14, color: "#ffffff", background: "none", border: "none", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.1)" : "none", cursor: "pointer" }}>
-                  {item.label}
-                </button>
-              ))}
+            <div onClick={e => e.stopPropagation()} style={{ position: "fixed", inset: 0, background: "#ffffff", zIndex: 200, display: "flex", flexDirection: "column", padding: "100px 40px 60px", animation: "fadeUp 0.25s ease" }}>
+              <button onClick={() => setMenuOpen(false)} style={{ position: "absolute", top: 28, right: 28, background: "none", border: "none", cursor: "pointer", fontSize: 24, color: T.text, lineHeight: 1 }}>×</button>
+              <nav style={{ flex: 1 }}>
+                {[{ label: "Creative Processes", ref: faqRef, tab: "faqs" }, { label: "Preferred Suppliers", ref: suppliersRef, tab: "suppliers" }, { label: "Resources", ref: resourcesRef, tab: "resources" }].map(item => (
+                  <button key={item.label} onClick={() => scrollTo(item.ref, item.tab)} style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 0", fontFamily: T.fontSans, fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 300, color: T.text, background: "none", border: "none", borderBottom: `1px solid ${T.border}`, cursor: "pointer", letterSpacing: "-0.5px", lineHeight: 1.3 }}>
+                    {item.label}
+                  </button>
+                ))}
+              </nav>
+              <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 32, marginTop: 32 }}>
+                <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 12 }}>For more information</p>
+                <a href="mailto:molly@prendiville.com.au" style={{ display: "block", fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, textDecoration: "none", marginBottom: 6 }}>molly@prendiville.com.au</a>
+                <a href="mailto:michael@prendiville.com.au" style={{ display: "block", fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, textDecoration: "none" }}>michael@prendiville.com.au</a>
+              </div>
             </div>
           )}
         </div>
