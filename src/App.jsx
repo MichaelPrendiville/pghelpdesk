@@ -342,7 +342,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
       <div ref={faqRef} style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 20px 80px" }} onClick={() => setDropdownOpen(false)}>
         <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 8 }}>Processes</h2>
         <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 24, maxWidth: 480 }}>
-          Browse our processes and guides. Can't find what you're looking for? Get in touch with our support team.
+          The following Creative Processes have been developed to provide clear guidance on how marketing, branding, and design requests are managed across the group. It outlines key responsibilities, communication pathways, and approval processes to ensure consistency, efficiency, and high-quality output at every stage.
         </p>
         <div style={{ borderTop: `1px solid ${T.border}`, marginBottom: 24 }} />
 
@@ -399,7 +399,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
           </div>
         </div>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 80px" }} onClick={e => e.stopPropagation()}>
-          <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 24 }}>Our trusted network of preferred suppliers and service providers.</p>
+          <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 24 }}>The following Preferred Suppliers list has been developed to guide venues in selecting trusted industry partners. These suppliers have been carefully chosen based on their proven quality, reliability, and understanding of the group's brand standards.</p>
 
           {/* Category dropdown + Search — equal widths */}
           <div style={{ display: "flex", gap: 12, marginBottom: 24 }} onClick={e => e.stopPropagation()}>
@@ -448,7 +448,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
           </div>
         </div>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 80px" }}>
-          <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 32 }}>Access and download documents, forms and guides.</p>
+          <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 32 }}>The following resources have been developed to support venues in planning, briefing, and executing their marketing and branding activities with clarity and consistency.</p>
 
           {resources.length === 0 ? (
             <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textXMuted, fontStyle: "italic" }}>No resources available yet.</p>
