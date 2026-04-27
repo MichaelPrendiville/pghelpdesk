@@ -515,11 +515,8 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
               {resources.map((r, i) => (
                 <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 20px", borderBottom: i < resources.length - 1 ? `1px solid ${T.border}` : "none" }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.text, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: 2 }}>{r.name}</p>
-                    <p style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textXMuted, letterSpacing: "0.05em" }}>
-                      {r.category && <span style={{ marginRight: 8 }}>{r.category} ·</span>}
-                      {formatSize(r.size)} · {r.name.split(".").pop().toUpperCase()}
-                    </p>
+                    <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.text, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.name}</p>
+                    {r.category && <p style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textXMuted, letterSpacing: "0.05em", marginTop: 2 }}>{r.category}</p>}
                   </div>
                   <button onClick={() => download(r)} style={{ flexShrink: 0, background: T.text, color: T.bg, border: "none", borderRadius: 4, padding: "7px 14px", fontFamily: T.fontSans, fontSize: 12, fontWeight: 500, cursor: "pointer" }}>↓ Download</button>
                 </div>
@@ -669,7 +666,7 @@ function AdminLogin({ onLogin, onBack }) {
 // ADMIN CMS
 // ═══════════════════════════════════════════════════════════════════════════════
 function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppliersBanner, resourcesBanner, setResourcesBanner, heroLogo, setHeroLogo, heroImage, setHeroImage, faqsBanner, setFaqsBanner, onLogout, onViewSite }) {
-  const { addFaq, updateFaq, deleteFaq: dbDeleteFaq, reorderFaqs, addSupplier, updateSupplier, deleteSupplier: dbDeleteSupplier, addResource, updateResource, deleteResource } = dbOps;
+  const { addFaq, updateFaq, deleteFaq: dbDeleteFaq, reorderFaqs, addSupplier, updateSupplier, deleteSupplier: dbDeleteSupplier, reorderSuppliers, addResource, updateResource, deleteResource, reorderResources } = dbOps;
   const [activeTab, setActiveTab] = useState("faqs");
 
   // FAQ state
@@ -692,6 +689,10 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
 
   const [toast, setToast] = useState(null);
   const [pendingResource, setPendingResource] = useState(null);
+  const [supplierDragIdx, setSupplierDragIdx] = useState(null);
+  const [supplierOverIdx, setSupplierOverIdx] = useState(null);
+  const [resourceDragIdx, setResourceDragIdx] = useState(null);
+  const [resourceOverIdx, setResourceOverIdx] = useState(null);
   function showToast(msg) { setToast(msg); setTimeout(() => setToast(null), 2200); }
 
   // FAQ functions
@@ -925,9 +926,19 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
               <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textXMuted, padding: "32px", textAlign: "center" }}>No results found.</p>
             )}
             {filteredSuppliers.map((s, i) => (
-              <div key={s.id} style={{ padding: "14px 22px", borderBottom: i < filteredSuppliers.length - 1 ? `1px solid ${T.border}` : "none", display: "flex", alignItems: "center", gap: 12, background: editingSupplier === s.id ? "#fafaf8" : T.surface }}>
+              <div key={s.id}
+                draggable
+                onDragStart={() => setSupplierDragIdx(i)}
+                onDragOver={e => { e.preventDefault(); setSupplierOverIdx(i); }}
+                onDrop={() => {
+                  if (supplierDragIdx === null || supplierDragIdx === i) return;
+                  const arr = [...suppliers]; const [m] = arr.splice(supplierDragIdx, 1); arr.splice(i, 0, m);
+                  reorderSuppliers(arr); setSupplierDragIdx(null); setSupplierOverIdx(null); showToast("Order updated");
+                }}
+                onDragEnd={() => { setSupplierDragIdx(null); setSupplierOverIdx(null); }}
+                style={{ padding: "14px 22px", borderBottom: i < filteredSuppliers.length - 1 ? `1px solid ${T.border}` : "none", display: "flex", alignItems: "center", gap: 12, background: supplierOverIdx === i ? "#f4f4f2" : editingSupplier === s.id ? "#fafaf8" : T.surface, transition: "background 0.15s" }}>
+                <span style={{ color: T.border, fontSize: 16, cursor: "grab", userSelect: "none", flexShrink: 0 }}>⠿</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.text, fontWeight: 500, marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.business}</p>
                   <p style={{ fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {[s.category, s.contact, s.phone].filter(Boolean).join(" · ")}
                   </p>
@@ -1025,7 +1036,18 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
                 const icon = icons[ext] || "📎";
                 const sizeFmt = r.size < 1048576 ? (r.size / 1024).toFixed(1) + " KB" : (r.size / 1048576).toFixed(1) + " MB";
                 return (
-                  <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 20px", borderBottom: i < resources.length - 1 ? `1px solid ${T.border}` : "none" }}>
+                  <div key={r.id}
+                    draggable
+                    onDragStart={() => setResourceDragIdx(i)}
+                    onDragOver={e => { e.preventDefault(); setResourceOverIdx(i); }}
+                    onDrop={() => {
+                      if (resourceDragIdx === null || resourceDragIdx === i) return;
+                      const arr = [...resources]; const [m] = arr.splice(resourceDragIdx, 1); arr.splice(i, 0, m);
+                      reorderResources(arr); setResourceDragIdx(null); setResourceOverIdx(null); showToast("Order updated");
+                    }}
+                    onDragEnd={() => { setResourceDragIdx(null); setResourceOverIdx(null); }}
+                    style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 20px", borderBottom: i < resources.length - 1 ? `1px solid ${T.border}` : "none", background: resourceOverIdx === i ? "#f4f4f2" : T.surface, transition: "background 0.15s" }}>
+                    <span style={{ color: T.border, fontSize: 16, cursor: "grab", userSelect: "none", flexShrink: 0 }}>⠿</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: 2 }}>{r.name}</p>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1214,8 +1236,8 @@ export default function App() {
     async function loadAll() {
       const [f, s, r, settings] = await Promise.all([
         sbFetch("faqs", { query: "?order=sort_order.asc,id.asc" }),
-        sbFetch("suppliers", { query: "?order=id.asc" }),
-        sbFetch("resources", { query: "?order=id.asc" }),
+        sbFetch("suppliers", { query: "?order=sort_order.asc,id.asc" }),
+        sbFetch("resources", { query: "?order=sort_order.asc,id.asc" }),
         sbFetch("settings", { query: "?key=in.(suppliers_banner,resources_banner,hero_logo,hero_image,faqs_banner)" }),
       ]);
       if (f) setFaqs(f);
@@ -1327,7 +1349,14 @@ export default function App() {
     await sbFetch("faqs", { method: "DELETE", query: `?id=eq.${id}` });
     setFaqs(p => p.filter(f => f.id !== id));
   }
-  async function reorderFaqs(newFaqs) {
+  async function reorderSuppliers(newSuppliers) {
+    setSuppliers(newSuppliers);
+    await Promise.all(newSuppliers.map((s, i) => sbFetch("suppliers", { method: "PATCH", query: `?id=eq.${s.id}`, body: { sort_order: i } })));
+  }
+  async function reorderResources(newResources) {
+    setResources(newResources);
+    await Promise.all(newResources.map((r, i) => sbFetch("resources", { method: "PATCH", query: `?id=eq.${r.id}`, body: { sort_order: i } })));
+  }
     setFaqs(newFaqs);
     await Promise.all(newFaqs.map((f, i) => sbFetch("faqs", { method: "PATCH", query: `?id=eq.${f.id}`, body: { sort_order: i } })));
   }
@@ -1366,7 +1395,7 @@ export default function App() {
     </div>
   );
 
-  const dbOps = { addFaq, updateFaq, deleteFaq, reorderFaqs, addSupplier, updateSupplier, deleteSupplier, addResource, updateResource, deleteResource };
+  const dbOps = { addFaq, updateFaq, deleteFaq, reorderFaqs, addSupplier, updateSupplier, deleteSupplier, reorderSuppliers, addResource, updateResource, deleteResource, reorderResources };
 
   return (
     <>
