@@ -295,7 +295,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
         {/* Hamburger menu dropdown */}
         {menuOpen && (
           <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 64, left: 16, background: "rgba(20,16,12,0.92)", backdropFilter: "blur(12px)", borderRadius: 8, overflow: "hidden", animation: "fadeUp 0.2s ease", minWidth: 220, zIndex: 100 }}>
-            {[{ label: "Processes", ref: faqRef, tab: "faqs" }, { label: "Preferred Suppliers", ref: suppliersRef, tab: "suppliers" }, { label: "Resources", ref: resourcesRef, tab: "resources" }].map((item, i, arr) => (
+            {[{ label: "Creative Processes", ref: faqRef, tab: "faqs" }, { label: "Preferred Suppliers", ref: suppliersRef, tab: "suppliers" }, { label: "Resources", ref: resourcesRef, tab: "resources" }].map((item, i, arr) => (
               <button key={item.label} onClick={() => scrollTo(item.ref, item.tab)} style={{ display: "block", width: "100%", textAlign: "left", padding: "16px 20px", fontFamily: T.fontSans, fontSize: 15, color: "#ffffff", background: "none", border: "none", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.1)" : "none", cursor: "pointer", letterSpacing: "0.02em" }}>
                 {item.label}
               </button>
@@ -319,7 +319,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
       <div style={{ borderBottom: `1px solid ${T.border}`, position: "sticky", top: 0, zIndex: 10, display: "flex" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", width: "100%" }}>
           {[
-            { label: "Processes", tab: "faqs", ref: faqRef, bg: "#f5f5f3" },
+            { label: "Creative Processes", tab: "faqs", ref: faqRef, bg: "#f5f5f3" },
             { label: "Preferred Suppliers", tab: "suppliers", ref: suppliersRef, bg: "#efefed" },
             { label: "Resources", tab: "resources", ref: resourcesRef, bg: "#e6e6e4" },
           ].map(t => (
@@ -340,8 +340,8 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
 
       {/* ── FAQs Section ── */}
       <div ref={faqRef} style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 20px 80px" }} onClick={() => setDropdownOpen(false)}>
-        <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 8 }}>Processes</h2>
-        <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 24, maxWidth: 480 }}>
+        <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 8 }}>Creative Processes</h2>
+        <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 24 }}>
           The following Creative Processes have been developed to provide clear guidance on how marketing, branding, and design requests are managed across the group. It outlines key responsibilities, communication pathways, and approval processes to ensure consistency, efficiency, and high-quality output at every stage.
         </p>
         <div style={{ borderTop: `1px solid ${T.border}`, marginBottom: 24 }} />
@@ -368,7 +368,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
           {/* Search */}
           <div style={{ position: "relative", flex: 1 }}>
             <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: T.text, fontSize: 14, pointerEvents: "none" }}>⌕</span>
-            <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search Processes…" style={{ width: "100%", padding: "10px 36px 10px 34px", border: `1px solid ${T.text}`, borderRadius: 6, fontFamily: T.fontSans, fontSize: 14, color: T.text, background: "transparent", outline: "none", boxSizing: "border-box" }} />
+            <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search Creative Processes…" style={{ width: "100%", padding: "10px 36px 10px 34px", border: `1px solid ${T.text}`, borderRadius: 6, fontFamily: T.fontSans, fontSize: 14, color: T.text, background: "transparent", outline: "none", boxSizing: "border-box" }} />
             {query && <button onClick={() => setQuery("")} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: T.textMuted, fontSize: 16 }}>×</button>}
           </div>
         </div>
@@ -389,13 +389,11 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
       {/* ── Preferred Suppliers Section ── */}
       <div ref={suppliersRef} style={{ background: "#efefed" }}>
         {/* Banner image - content width */}
-        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 0" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 20px 0" }}>
+          <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 24 }}>Preferred Suppliers</h2>
           <div style={{ width: "100%", height: 220, overflow: "hidden", position: "relative", borderRadius: 8 }}>
             <img src={suppliersBanner ? suppliersBanner : HERO_SRC} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block", backgroundColor: "#b0a898" }} />
-            <div style={{ position: "absolute", inset: 0, background: "rgba(20,16,12,0.35)" }} />
-            <div style={{ position: "absolute", bottom: 24, left: 24 }}>
-              <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: "#ffffff", letterSpacing: "-0.5px" }}>Preferred Suppliers</h2>
-            </div>
+            <div style={{ position: "absolute", inset: 0, background: "rgba(20,16,12,0.25)" }} />
           </div>
         </div>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 80px" }} onClick={e => e.stopPropagation()}>
@@ -438,13 +436,11 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
       {/* ── Resources Section ── */}
       <div ref={resourcesRef} style={{ background: "#e6e6e4" }}>
         {/* Banner image - content width */}
-        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 0" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 20px 0" }}>
+          <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 24 }}>Resources</h2>
           <div style={{ width: "100%", height: 220, overflow: "hidden", position: "relative", borderRadius: 8 }}>
             <img src={resourcesBanner ? resourcesBanner : HERO_SRC} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
-            <div style={{ position: "absolute", inset: 0, background: "rgba(20,16,12,0.35)" }} />
-            <div style={{ position: "absolute", bottom: 24, left: 24 }}>
-              <h2 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: "#ffffff", letterSpacing: "-0.5px" }}>Resources</h2>
-            </div>
+            <div style={{ position: "absolute", inset: 0, background: "rgba(20,16,12,0.25)" }} />
           </div>
         </div>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px 80px" }}>
@@ -479,7 +475,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
           <div style={{ flex: "1 1 260px" }}>
             <img src={heroLogo || LOGO_SRC} alt="PG Create" style={{ height: 40, width: "auto", marginBottom: 20 }} />
             <p style={{ fontFamily: T.fontSans, fontSize: 14, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, maxWidth: 280 }}>
-              Your guide to Prendiville Group Creative — Processes, preferred suppliers and resources.
+              Your guide to Prendiville Group Creative — Creative Processes, preferred suppliers and resources.
             </p>
           </div>
 
@@ -487,7 +483,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
           <div style={{ flex: "1 1 160px" }}>
             <p style={{ fontFamily: T.fontMono, fontSize: 10, color: "rgba(255,255,255,0.35)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 20 }}>Navigate</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {[{ label: "Processes", tab: "faqs", ref: faqRef }, { label: "Preferred Suppliers", tab: "suppliers", ref: suppliersRef }, { label: "Resources", tab: "resources", ref: resourcesRef }].map(item => (
+              {[{ label: "Creative Processes", tab: "faqs", ref: faqRef }, { label: "Preferred Suppliers", tab: "suppliers", ref: suppliersRef }, { label: "Resources", tab: "resources", ref: resourcesRef }].map(item => (
                 <button key={item.label} onClick={() => scrollTo(item.ref, item.tab)} style={{ fontFamily: T.fontSans, fontSize: 14, color: "rgba(255,255,255,0.6)", background: "none", border: "none", cursor: "pointer", textAlign: "left", padding: 0, transition: "color 0.15s" }}
                   onMouseEnter={e => e.currentTarget.style.color = "#ffffff"}
                   onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.6)"}>
@@ -641,11 +637,11 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
   function cancelEdit() { setEditing(null); setForm({ question: "", answer: "" }); }
   async function saveEdit() {
     if (!form.question.trim() || !form.answer.trim()) return;
-    if (editing === "new") { await addFaq(form); showToast("Process published"); }
+    if (editing === "new") { await addFaq(form); showToast("Creative Process published"); }
     else { await updateFaq(editing, form); showToast("Changes saved"); }
     cancelEdit();
   }
-  async function handleDeleteFaq(id) { await dbDeleteFaq(id); if (editing === id) cancelEdit(); showToast("Process deleted"); }
+  async function handleDeleteFaq(id) { await dbDeleteFaq(id); if (editing === id) cancelEdit(); showToast("Creative Process deleted"); }
   function onDragStart(i) { setDragIdx(i); }
   function onDragOver(e, i) { e.preventDefault(); setOverIdx(i); }
   async function onDrop(i) {
@@ -694,7 +690,7 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
           </div>
           {/* Tab bar */}
           <div style={{ display: "flex" }}>
-            {[{ id: "faqs", label: "Processes" }, { id: "suppliers", label: "Preferred Suppliers" }, { id: "resources", label: "Resources" }, { id: "settings", label: "Settings" }].map(t => (
+            {[{ id: "faqs", label: "Creative Processes" }, { id: "suppliers", label: "Preferred Suppliers" }, { id: "resources", label: "Resources" }, { id: "settings", label: "Settings" }].map(t => (
               <button key={t.id} onClick={() => { setActiveTab(t.id); cancelEdit(); cancelEditSupplier(); }} style={{
                 fontFamily: T.fontSans, fontSize: 14,
                 color: activeTab === t.id ? T.text : T.textMuted,
@@ -715,7 +711,7 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
         {activeTab === "faqs" && (<>
           <h1 style={{ fontFamily: T.fontSans, fontSize: 32, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 8 }}>FAQ Manager</h1>
           <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.6, marginBottom: 28 }}>
-            Add, edit, reorder and delete process entries. Changes appear on the public site immediately.
+            Add, edit, reorder and delete creative process entries. Changes appear on the public site immediately.
           </p>
           <div style={{ borderTop: `1px solid ${T.border}`, marginBottom: 20 }} />
 
@@ -726,7 +722,7 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
           {/* Search */}
           <div style={{ position: "relative", marginBottom: 16 }}>
             <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: T.textXMuted, fontSize: 14, pointerEvents: "none" }}>⌕</span>
-            <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search Processes…"
+            <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search Creative Processes…"
               style={{ width: "100%", padding: "9px 34px 9px 34px", border: `1px solid ${query ? T.text : T.border}`, borderRadius: 6, fontFamily: T.fontSans, fontSize: 14, color: T.text, background: T.surface, outline: "none", boxSizing: "border-box" }} />
             {query && <button onClick={() => setQuery("")} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: T.textMuted, fontSize: 16 }}>×</button>}
           </div>
@@ -736,13 +732,13 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
             <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderLeft: `3px solid ${T.text}`, borderRadius: 8, padding: "20px 22px", marginBottom: 12, animation: "fadeUp 0.2s ease" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
                 <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                  {editing === "new" ? "NEW PROCESS" : "EDIT PROCESS"}
+                  {editing === "new" ? "NEW CREATIVE PROCESS" : "EDIT CREATIVE PROCESS"}
                 </p>
                 <button onClick={cancelEdit} style={{ fontFamily: T.fontSans, fontSize: 18, color: T.textMuted, background: "none", border: "none", cursor: "pointer", lineHeight: 1 }}>×</button>
               </div>
               <label style={{ display: "block", marginBottom: 12 }}>
                 <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Question</span>
-                <input value={form.question} onChange={e => setForm(f => ({ ...f, question: e.target.value }))} placeholder="What is the process?" style={fieldStyle} />
+                <input value={form.question} onChange={e => setForm(f => ({ ...f, question: e.target.value }))} placeholder="What is the creative process?" style={fieldStyle} />
               </label>
               <label style={{ display: "block", marginBottom: 16 }}>
                 <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Answer</span>
