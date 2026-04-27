@@ -135,18 +135,17 @@ function AccordionItem({ faq, index }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // SUPPLIER ITEM ACCORDION
 // ═══════════════════════════════════════════════════════════════════════════════
-function SupplierItem({ supplier, index }) {
-  const [open, setOpen] = useState(false);
+function SupplierItem({ supplier, index, isOpen, onToggle }) {
   return (
     <div style={{ borderBottom: `1px solid ${T.border}` }}>
-      <button onClick={() => setOpen(!open)} style={{ width: "100%", background: "none", border: "none", padding: "18px 0", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, cursor: "pointer", textAlign: "left" }}>
+      <button onClick={onToggle} style={{ width: "100%", background: "none", border: "none", padding: "18px 0", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, cursor: "pointer", textAlign: "left" }}>
         <span style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
           <span style={{ fontFamily: T.fontSans, fontSize: 17, color: T.text, fontWeight: 400, lineHeight: 1.3 }}>{supplier.business}</span>
           {supplier.category && <span style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase" }}>{supplier.category}</span>}
         </span>
-        <span style={{ fontFamily: T.fontMono, fontSize: 16, color: T.textMuted, flexShrink: 0, transform: open ? "rotate(45deg)" : "rotate(0deg)", transition: "transform 0.25s ease", display: "block" }}>+</span>
+        <span style={{ fontFamily: T.fontMono, fontSize: 16, color: T.textMuted, flexShrink: 0, transform: isOpen ? "rotate(45deg)" : "rotate(0deg)", transition: "transform 0.25s ease", display: "block" }}>+</span>
       </button>
-      <div style={{ maxHeight: open ? "300px" : 0, overflow: "hidden", transition: "max-height 0.35s cubic-bezier(0.4,0,0.2,1)" }}>
+      <div style={{ maxHeight: isOpen ? "300px" : 0, overflow: "hidden", transition: "max-height 0.35s cubic-bezier(0.4,0,0.2,1)" }}>
         <div style={{ paddingBottom: 20, paddingLeft: 34, display: "flex", flexDirection: "column", gap: 8 }}>
           {supplier.contact && (
             <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
@@ -164,7 +163,7 @@ function SupplierItem({ supplier, index }) {
             <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
               <span style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", minWidth: 64 }}>Phone</span>
               <button onClick={() => window.open(`tel:${supplier.phone.replace(/\s/g, "")}`, "_self")} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, display: "inline-flex", alignItems: "center", gap: 5, borderBottom: `1px solid ${T.border}`, background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" }}>
-                <span style={{ fontSize: 12 }}>📞</span>{supplier.phone}
+                {supplier.phone}
               </button>
             </div>
           )}
@@ -172,7 +171,7 @@ function SupplierItem({ supplier, index }) {
             <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
               <span style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", minWidth: 64 }}>Mobile</span>
               <button onClick={() => window.open(`tel:${supplier.mobile.replace(/\s/g, "")}`, "_self")} style={{ fontFamily: T.fontSans, fontSize: 14, color: T.text, display: "inline-flex", alignItems: "center", gap: 5, borderBottom: `1px solid ${T.border}`, background: "none", border: "none", cursor: "pointer", padding: 0, textDecoration: "underline" }}>
-                <span style={{ fontSize: 12 }}>📱</span>{supplier.mobile}
+                {supplier.mobile}
               </button>
             </div>
           )}
@@ -199,6 +198,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
   const [catDropdownOpen, setCatDropdownOpen] = useState(false);
   const [category, setCategory] = useState("All Categories");
   const [supplierSearch, setSupplierSearch] = useState("");
+  const [openSupplierId, setOpenSupplierId] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -490,7 +490,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "0 24px", borderTop: `1px solid ${T.border}` }}>
             {suppliers.length === 0 && <p style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textXMuted, padding: "24px 0", textAlign: "center", gridColumn: "1 / -1" }}>No suppliers added yet.</p>}
-            {suppliersFiltered.map((s, i) => <SupplierItem key={s.id} supplier={s} index={i} />)}
+            {suppliersFiltered.map((s, i) => <SupplierItem key={s.id} supplier={s} index={i} isOpen={openSupplierId === s.id} onToggle={() => setOpenSupplierId(openSupplierId === s.id ? null : s.id)} />)}
           </div>
         </div>
       </div>
