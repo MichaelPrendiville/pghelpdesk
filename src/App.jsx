@@ -932,13 +932,14 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
                 onDragOver={e => { e.preventDefault(); setSupplierOverIdx(i); }}
                 onDrop={() => {
                   if (supplierDragIdx === null || supplierDragIdx === i) return;
-                  const arr = [...suppliers]; const [m] = arr.splice(supplierDragIdx, 1); arr.splice(i, 0, m);
+                  const arr = [...filteredSuppliers]; const [m] = arr.splice(supplierDragIdx, 1); arr.splice(i, 0, m);
                   reorderSuppliers(arr); setSupplierDragIdx(null); setSupplierOverIdx(null); showToast("Order updated");
                 }}
                 onDragEnd={() => { setSupplierDragIdx(null); setSupplierOverIdx(null); }}
                 style={{ padding: "14px 22px", borderBottom: i < filteredSuppliers.length - 1 ? `1px solid ${T.border}` : "none", display: "flex", alignItems: "center", gap: 12, background: supplierOverIdx === i ? "#f4f4f2" : editingSupplier === s.id ? "#fafaf8" : T.surface, transition: "background 0.15s" }}>
                 <span style={{ color: T.border, fontSize: 16, cursor: "grab", userSelect: "none", flexShrink: 0 }}>⠿</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.text, fontWeight: 500, marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.business}</p>
                   <p style={{ fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {[s.category, s.contact, s.phone].filter(Boolean).join(" · ")}
                   </p>
@@ -1044,8 +1045,7 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
                       if (resourceDragIdx === null || resourceDragIdx === i) return;
                       const arr = [...resources]; const [m] = arr.splice(resourceDragIdx, 1); arr.splice(i, 0, m);
                       reorderResources(arr); setResourceDragIdx(null); setResourceOverIdx(null); showToast("Order updated");
-                    }}
-                    onDragEnd={() => { setResourceDragIdx(null); setResourceOverIdx(null); }}
+                    }}                    onDragEnd={() => { setResourceDragIdx(null); setResourceOverIdx(null); }}
                     style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 20px", borderBottom: i < resources.length - 1 ? `1px solid ${T.border}` : "none", background: resourceOverIdx === i ? "#f4f4f2" : T.surface, transition: "background 0.15s" }}>
                     <span style={{ color: T.border, fontSize: 16, cursor: "grab", userSelect: "none", flexShrink: 0 }}>⠿</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
