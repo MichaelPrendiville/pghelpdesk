@@ -274,7 +274,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
 
   return (
     <div style={{ minHeight: "100vh", background: T.bg, fontFamily: T.fontSans }} onClick={() => { setDropdownOpen(false); setCatDropdownOpen(false); setMenuOpen(false); }}>
-      <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} } input::placeholder { color: #aaa89f; }`}</style>
+      <style>{`* { box-sizing: border-box; margin: 0; padding: 0; } @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} } @keyframes slideIn { from{transform:translateX(-100%)} to{transform:translateX(0)} } input::placeholder { color: #aaa89f; }`}</style>
 
       {/* ── Hero ── */}
       <div style={{ width: "100%", height: "100vh", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
@@ -304,24 +304,26 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
 
         {/* Hamburger menu dropdown */}
         {menuOpen && (
-          <div onClick={e => e.stopPropagation()} style={{ position: "fixed", inset: 0, background: "#ffffff", zIndex: 200, display: "flex", flexDirection: "column", padding: "100px 40px 60px", animation: "fadeUp 0.25s ease" }}>
-            {/* Close button */}
-            <button onClick={() => setMenuOpen(false)} style={{ position: "absolute", top: 28, right: 28, background: "none", border: "none", cursor: "pointer", fontSize: 24, color: T.text, lineHeight: 1 }}>×</button>
-            {/* Nav links */}
-            <nav style={{ flex: 1 }}>
-              {[{ label: "Creative Processes", ref: faqRef, tab: "faqs" }, { label: "Preferred Suppliers", ref: suppliersRef, tab: "suppliers" }, { label: "Resources", ref: resourcesRef, tab: "resources" }].map(item => (
-                <button key={item.label} onClick={() => scrollTo(item.ref, item.tab)} style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 0", fontFamily: T.fontSans, fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 300, color: T.text, background: "none", border: "none", borderBottom: `1px solid ${T.border}`, cursor: "pointer", letterSpacing: "-0.5px", lineHeight: 1.3 }}>
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-            {/* Footer contact in menu */}
-            <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 32, marginTop: 32 }}>
-              <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 12 }}>For more information</p>
-              <a href="mailto:molly@prendiville.com.au" style={{ display: "block", fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, textDecoration: "none", marginBottom: 6 }}>molly@prendiville.com.au</a>
-              <a href="mailto:michael@prendiville.com.au" style={{ display: "block", fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, textDecoration: "none" }}>michael@prendiville.com.au</a>
+          <>
+            {/* Backdrop */}
+            <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)", zIndex: 199, animation: "fadeUp 0.2s ease" }} />
+            {/* Side panel */}
+            <div onClick={e => e.stopPropagation()} style={{ position: "fixed", top: 0, left: 0, bottom: 0, width: "min(380px, 85vw)", background: "#ffffff", zIndex: 200, display: "flex", flexDirection: "column", padding: "32px 36px 48px", animation: "slideIn 0.3s ease", overflowY: "auto" }}>
+              <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 32 }}>Browse</p>
+              <nav style={{ flex: 1 }}>
+                {[{ label: "Creative Processes", ref: faqRef, tab: "faqs" }, { label: "Preferred Suppliers", ref: suppliersRef, tab: "suppliers" }, { label: "Resources", ref: resourcesRef, tab: "resources" }].map(item => (
+                  <button key={item.label} onClick={() => scrollTo(item.ref, item.tab)} style={{ display: "block", width: "100%", textAlign: "left", padding: "12px 0", fontFamily: T.fontSans, fontSize: "clamp(1.6rem, 4vw, 2.2rem)", fontWeight: 300, color: T.text, background: "none", border: "none", borderBottom: `1px solid ${T.border}`, cursor: "pointer", letterSpacing: "-0.3px", lineHeight: 1.25 }}>
+                    {item.label}
+                  </button>
+                ))}
+              </nav>
+              <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 28, marginTop: 28 }}>
+                <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 14 }}>For more information</p>
+                <a href="mailto:molly@prendiville.com.au" style={{ display: "block", fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, textDecoration: "underline", marginBottom: 8 }}>molly@prendiville.com.au</a>
+                <a href="mailto:michael@prendiville.com.au" style={{ display: "block", fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, textDecoration: "underline" }}>michael@prendiville.com.au</a>
+              </div>
             </div>
-          </div>
+          </>
         )}
 
         {/* Centre hero text */}
@@ -358,21 +360,24 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
           </div>
           {/* Sticky nav menu dropdown */}
           {menuOpen && (
-            <div onClick={e => e.stopPropagation()} style={{ position: "fixed", inset: 0, background: "#ffffff", zIndex: 200, display: "flex", flexDirection: "column", padding: "100px 40px 60px", animation: "fadeUp 0.25s ease" }}>
-              <button onClick={() => setMenuOpen(false)} style={{ position: "absolute", top: 28, right: 28, background: "none", border: "none", cursor: "pointer", fontSize: 24, color: T.text, lineHeight: 1 }}>×</button>
-              <nav style={{ flex: 1 }}>
-                {[{ label: "Creative Processes", ref: faqRef, tab: "faqs" }, { label: "Preferred Suppliers", ref: suppliersRef, tab: "suppliers" }, { label: "Resources", ref: resourcesRef, tab: "resources" }].map(item => (
-                  <button key={item.label} onClick={() => scrollTo(item.ref, item.tab)} style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 0", fontFamily: T.fontSans, fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 300, color: T.text, background: "none", border: "none", borderBottom: `1px solid ${T.border}`, cursor: "pointer", letterSpacing: "-0.5px", lineHeight: 1.3 }}>
-                    {item.label}
-                  </button>
-                ))}
-              </nav>
-              <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 32, marginTop: 32 }}>
-                <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 12 }}>For more information</p>
-                <a href="mailto:molly@prendiville.com.au" style={{ display: "block", fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, textDecoration: "none", marginBottom: 6 }}>molly@prendiville.com.au</a>
-                <a href="mailto:michael@prendiville.com.au" style={{ display: "block", fontFamily: T.fontSans, fontSize: 14, color: T.textMuted, textDecoration: "none" }}>michael@prendiville.com.au</a>
+            <>
+              <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)", zIndex: 199 }} />
+              <div onClick={e => e.stopPropagation()} style={{ position: "fixed", top: 0, left: 0, bottom: 0, width: "min(380px, 85vw)", background: "#ffffff", zIndex: 200, display: "flex", flexDirection: "column", padding: "32px 36px 48px", animation: "slideIn 0.3s ease", overflowY: "auto" }}>
+                <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 32 }}>Browse</p>
+                <nav style={{ flex: 1 }}>
+                  {[{ label: "Creative Processes", ref: faqRef, tab: "faqs" }, { label: "Preferred Suppliers", ref: suppliersRef, tab: "suppliers" }, { label: "Resources", ref: resourcesRef, tab: "resources" }].map(item => (
+                    <button key={item.label} onClick={() => scrollTo(item.ref, item.tab)} style={{ display: "block", width: "100%", textAlign: "left", padding: "12px 0", fontFamily: T.fontSans, fontSize: "clamp(1.6rem, 4vw, 2.2rem)", fontWeight: 300, color: T.text, background: "none", border: "none", borderBottom: `1px solid ${T.border}`, cursor: "pointer", letterSpacing: "-0.3px", lineHeight: 1.25 }}>
+                      {item.label}
+                    </button>
+                  ))}
+                </nav>
+                <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 28, marginTop: 28 }}>
+                  <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 14 }}>For more information</p>
+                  <a href="mailto:molly@prendiville.com.au" style={{ display: "block", fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, textDecoration: "underline", marginBottom: 8 }}>molly@prendiville.com.au</a>
+                  <a href="mailto:michael@prendiville.com.au" style={{ display: "block", fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, textDecoration: "underline" }}>michael@prendiville.com.au</a>
+                </div>
               </div>
-            </div>
+            </>
           )}
         </div>
       )}
@@ -609,7 +614,7 @@ function AdminLogin({ onLogin, onBack }) {
       <style>{`* { box-sizing: border-box; margin: 0; padding: 0; }`}</style>
       <div style={{ width: "100%", maxWidth: 360 }}>
         {/* Brand */}
-        <p style={{ fontFamily: T.fontSans, fontSize: 22, fontWeight: 600, color: T.text, marginBottom: 32, letterSpacing: "-0.3px" }}>PG Create</p>
+        <img src={LOGO_SRC} alt="PG Create" style={{ height: 48, width: "auto", marginBottom: 32, filter: "brightness(0)" }} />
 
         <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, padding: 28 }}>
           <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>RESTRICTED</p>
