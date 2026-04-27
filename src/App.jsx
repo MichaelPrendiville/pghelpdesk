@@ -614,7 +614,7 @@ function AdminLogin({ onLogin, onBack }) {
       <style>{`* { box-sizing: border-box; margin: 0; padding: 0; }`}</style>
       <div style={{ width: "100%", maxWidth: 360 }}>
         {/* Brand */}
-        <img src={LOGO_SRC} alt="PG Create" style={{ height: 48, width: "auto", marginBottom: 32, filter: "brightness(0)" }} />
+        <img src={LOGO_SRC} alt="PG Create" style={{ height: 72, width: "auto", marginBottom: 32, filter: "brightness(0)" }} />
 
         <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, padding: 28 }}>
           <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>RESTRICTED</p>
@@ -691,6 +691,7 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
     : suppliers;
 
   const [toast, setToast] = useState(null);
+  const [pendingResource, setPendingResource] = useState(null);
   function showToast(msg) { setToast(msg); setTimeout(() => setToast(null), 2200); }
 
   // FAQ functions
@@ -948,39 +949,68 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
           </p>
           <div style={{ borderTop: `1px solid ${T.border}`, marginBottom: 20 }} />
 
-          {/* Upload area */}
-          <label style={{ display: "block", marginBottom: 24, cursor: "pointer" }}>
-            <div style={{ border: `2px dashed ${T.border}`, borderRadius: 8, padding: "32px 24px", textAlign: "center" }}
-              onDragOver={e => { e.preventDefault(); e.currentTarget.style.borderColor = T.text; }}
-              onDragLeave={e => { e.currentTarget.style.borderColor = T.border; }}
-              onDrop={e => {
-                e.preventDefault();
-                e.currentTarget.style.borderColor = T.border;
-                const allowed = ["application/pdf","application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/vnd.ms-excel","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"];
-                Array.from(e.dataTransfer.files).forEach(file => {
+          {/* Pending upload — name entry form */}
+          {pendingResource ? (
+            <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderLeft: `3px solid ${T.text}`, borderRadius: 8, padding: "20px 22px", marginBottom: 24, animation: "fadeUp 0.2s ease" }}>
+              <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 16 }}>Name your document</p>
+              <label style={{ display: "block", marginBottom: 12 }}>
+                <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Document Name *</span>
+                <input
+                  value={pendingResource.displayName}
+                  onChange={e => setPendingResource(p => ({ ...p, displayName: e.target.value }))}
+                  placeholder={pendingResource.file.name}
+                  autoFocus
+                  style={fieldStyle}
+                />
+              </label>
+              <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, marginBottom: 16 }}>File: {pendingResource.file.name} · {(pendingResource.file.size / 1024).toFixed(1)} KB</p>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => {
+                  const name = pendingResource.displayName.trim() || pendingResource.file.name;
+                  addResource({ name, size: pendingResource.file.size, type: pendingResource.file.type, data: pendingResource.data, category: "", uploaded_at: new Date().toLocaleDateString() });
+                  showToast(name + " uploaded");
+                  setPendingResource(null);
+                }} style={{ background: T.text, color: T.bg, border: "none", borderRadius: 4, padding: "8px 18px", fontFamily: T.fontSans, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
+                  Upload
+                </button>
+                <button onClick={() => setPendingResource(null)} style={{ background: "none", border: `1px solid ${T.border}`, borderRadius: 4, padding: "8px 14px", fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, cursor: "pointer" }}>Cancel</button>
+              </div>
+            </div>
+          ) : (
+            /* Upload area */
+            <label style={{ display: "block", marginBottom: 24, cursor: "pointer" }}>
+              <div style={{ border: `2px dashed ${T.border}`, borderRadius: 8, padding: "32px 24px", textAlign: "center" }}
+                onDragOver={e => { e.preventDefault(); e.currentTarget.style.borderColor = T.text; }}
+                onDragLeave={e => { e.currentTarget.style.borderColor = T.border; }}
+                onDrop={e => {
+                  e.preventDefault();
+                  e.currentTarget.style.borderColor = T.border;
+                  const allowed = ["application/pdf","application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/vnd.ms-excel","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"];
+                  const file = e.dataTransfer.files[0];
+                  if (!file) return;
                   if (!allowed.includes(file.type)) return showToast("Only PDF, Word and Excel allowed");
                   const reader = new FileReader();
-                  reader.onload = ev => { addResource({ name: file.name, size: file.size, type: file.type, data: ev.target.result, category: "", uploaded_at: new Date().toLocaleDateString() }); showToast(file.name + " uploaded"); };
+                  reader.onload = ev => setPendingResource({ file, data: ev.target.result, displayName: "" });
                   reader.readAsDataURL(file);
-                });
-              }}
-            >
-              <p style={{ fontFamily: T.fontSans, fontSize: 28, marginBottom: 8 }}>📎</p>
-              <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.text, fontWeight: 500, marginBottom: 4 }}>Drag & drop files here</p>
-              <p style={{ fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, marginBottom: 12 }}>or click to browse</p>
-              <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em" }}>PDF · WORD · EXCEL</p>
-            </div>
-            <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" multiple style={{ display: "none" }}
-              onChange={e => {
-                Array.from(e.target.files).forEach(file => {
+                }}
+              >
+                <p style={{ fontFamily: T.fontSans, fontSize: 28, marginBottom: 8 }}>📎</p>
+                <p style={{ fontFamily: T.fontSans, fontSize: 15, color: T.text, fontWeight: 500, marginBottom: 4 }}>Drag & drop files here</p>
+                <p style={{ fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, marginBottom: 12 }}>or click to browse</p>
+                <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em" }}>PDF · WORD · EXCEL</p>
+              </div>
+              <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" style={{ display: "none" }}
+                onChange={e => {
+                  const file = e.target.files[0];
+                  if (!file) return;
                   const reader = new FileReader();
-                  reader.onload = ev => { setResources(p => [...p, { id: nextId++, name: file.name, size: file.size, type: file.type, data: ev.target.result, category: "", uploadedAt: new Date().toLocaleDateString() }]); showToast(file.name + " uploaded"); };
+                  reader.onload = ev => setPendingResource({ file, data: ev.target.result, displayName: "" });
                   reader.readAsDataURL(file);
-                });
-                e.target.value = "";
-              }}
-            />
-          </label>
+                  e.target.value = "";
+                }}
+              />
+            </label>
+          )}
 
           {/* File list */}
           {resources.length === 0 ? (
