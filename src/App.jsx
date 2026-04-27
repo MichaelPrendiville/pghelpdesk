@@ -328,7 +328,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
       {/* ── Sticky nav (appears on scroll) ── */}
       {scrolled && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, background: "rgba(255,255,255,0.96)", backdropFilter: "blur(12px)", borderBottom: `1px solid ${T.border}`, animation: "fadeUp 0.2s ease" }}>
-          <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56 }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 72 }}>
             {/* Hamburger */}
             <button onClick={e => { e.stopPropagation(); setMenuOpen(o => !o); }} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", gap: 5, padding: 4 }}>
               <span style={{ display: "block", width: 22, height: 1.5, background: T.text }} />
@@ -336,7 +336,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
               <span style={{ display: "block", width: 22, height: 1.5, background: T.text }} />
             </button>
             {/* Logo */}
-            <img src={heroLogo || LOGO_SRC} alt="PG Create" style={{ height: 28, width: "auto", filter: "brightness(0)" }} />
+            <img src={heroLogo || LOGO_SRC} alt="PG Create" style={{ height: 40, width: "auto", filter: "brightness(0)" }} />
             {/* Admin icon */}
             <button onClick={onGoAdmin} style={{ background: "none", border: "none", cursor: "pointer", color: T.text, display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32 }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -347,7 +347,7 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
           </div>
           {/* Sticky nav menu dropdown */}
           {menuOpen && (
-            <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 56, left: 20, background: T.text, borderRadius: 8, overflow: "hidden", animation: "fadeUp 0.15s ease", minWidth: 220, zIndex: 100, boxShadow: "0 8px 32px rgba(0,0,0,0.15)" }}>
+            <div onClick={e => e.stopPropagation()} style={{ position: "absolute", top: 72, left: 20, background: T.text, borderRadius: 8, overflow: "hidden", animation: "fadeUp 0.15s ease", minWidth: 220, zIndex: 100, boxShadow: "0 8px 32px rgba(0,0,0,0.15)" }}>
               {[{ label: "Creative Processes", ref: faqRef, tab: "faqs" }, { label: "Preferred Suppliers", ref: suppliersRef, tab: "suppliers" }, { label: "Resources", ref: resourcesRef, tab: "resources" }].map((item, i, arr) => (
                 <button key={item.label} onClick={() => scrollTo(item.ref, item.tab)} style={{ display: "block", width: "100%", textAlign: "left", padding: "14px 20px", fontFamily: T.fontSans, fontSize: 14, color: "#ffffff", background: "none", border: "none", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.1)" : "none", cursor: "pointer" }}>
                   {item.label}
@@ -360,8 +360,9 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
 
       {/* ── Intro paragraph ── */}
       <div style={{ background: T.surface, borderBottom: `1px solid ${T.border}` }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 20px" }}>
-          <p style={{ fontFamily: T.fontSans, fontSize: "clamp(1.05rem, 2vw, 1.25rem)", fontWeight: 500, color: T.text, lineHeight: 1.7, maxWidth: 860 }}>
+        <div style={{ maxWidth: 900, margin: "0 auto", padding: "72px 20px 80px", textAlign: "center" }}>
+          <p style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textXMuted, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 24 }}>PG Create</p>
+          <p style={{ fontFamily: T.fontSans, fontSize: "clamp(1.25rem, 2.5vw, 1.75rem)", fontWeight: 300, color: T.text, lineHeight: 1.65, letterSpacing: "-0.3px" }}>
             This website brings together the foundations of the Prendiville Group Creative, with clear creative processes, trusted preferred suppliers, and practical resource documents in one place. It's designed to inspire confident decision-making and ensure each brand experience is delivered with consistency, clarity, and impact.
           </p>
         </div>
