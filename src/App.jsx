@@ -1215,10 +1215,72 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
 
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// SITE PASSWORD GATE
+// ═══════════════════════════════════════════════════════════════════════════════
+const SITE_PASSWORD = "pgcreate2025";
 
+function PasswordGate({ onUnlock }) {
+  const [val, setVal] = useState("");
+  const [error, setError] = useState(false);
+
+  function attempt() {
+    if (val === SITE_PASSWORD) {
+      try { sessionStorage.setItem("pg_unlocked", "1"); } catch {}
+      onUnlock();
+    } else {
+      setError(true);
+      setTimeout(() => setError(false), 1500);
+    }
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", background: T.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: T.fontSans }}>
+      <style>{`* { box-sizing: border-box; margin: 0; padding: 0; }`}</style>
+      <img src={LOGO_SRC} alt="PG Create" style={{ height: 64, width: "auto", marginBottom: 48, filter: "brightness(0)" }} />
+      <div style={{ background: T.surface, borderRadius: 12, padding: "40px 36px", width: "100%", maxWidth: 400, boxShadow: "0 4px 32px rgba(0,0,0,0.06)" }}>
+        <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 8 }}>Restricted</p>
+        <h1 style={{ fontFamily: T.fontSans, fontSize: 28, fontWeight: 300, color: T.text, letterSpacing: "-0.5px", marginBottom: 28 }}>Enter password</h1>
+        <label style={{ display: "block", marginBottom: 16 }}>
+          <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 8 }}>Password</p>
+          <input
+            type="password"
+            value={val}
+            onChange={e => setVal(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && attempt()}
+            placeholder="Enter password"
+            autoFocus
+            style={{ width: "100%", padding: "12px 14px", border: `1px solid ${error ? "#dc2626" : T.border}`, borderRadius: 6, fontFamily: T.fontSans, fontSize: 15, color: T.text, background: T.bg, outline: "none", transition: "border-color 0.2s" }}
+          />
+          {error && <p style={{ fontFamily: T.fontSans, fontSize: 13, color: "#dc2626", marginTop: 6 }}>Incorrect password. Please try again.</p>}
+        </label>
+        <button onClick={attempt} style={{ width: "100%", padding: "12px", background: T.text, color: T.bg, border: "none", borderRadius: 6, fontFamily: T.fontSans, fontSize: 15, fontWeight: 500, cursor: "pointer", marginTop: 8 }}>
+          Enter
+        </button>
+      </div>
+      <p style={{ fontFamily: T.fontSans, fontSize: 13, color: T.textXMuted, marginTop: 24 }}>
+        For access, contact <a href="mailto:molly@prendiville.com.au" style={{ color: T.textMuted }}>molly@prendiville.com.au</a>
+      </p>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // APP ROUTER
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function App() {
+  useFonts();
+
+  // Check if already unlocked this session
+  const [unlocked, setUnlocked] = useState(() => {
+    try { return sessionStorage.getItem("pg_unlocked") === "1"; } catch { return false; }
+  });
+
+  if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
+
+  return <AppInner />;
+}
+
+function AppInner() {
   useFonts();
   const [faqs, setFaqs] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
