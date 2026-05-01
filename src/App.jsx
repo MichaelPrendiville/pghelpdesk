@@ -320,8 +320,8 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
                 ))}
               </nav>
               <a href="https://fixion.com.au" target="_blank" rel="noreferrer" style={{ display: "flex", alignItems: "center", padding: "12px 0", borderBottom: `1px solid ${T.border}`, textDecoration: "none", gap: 10 }}>
-                <img src={FIXION_SRC} alt="Fixion" style={{ height: 28, width: "auto" }} />
-                <span style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted }}>fixion.com.au ↗</span>
+                <img src={FIXION_SRC} alt="Fixion" style={{ height: 40, width: "auto" }} />
+                <span style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted }}>Find it. Fix it.</span>
               </a>
               <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 28, marginTop: 28 }}>
                 <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 14 }}>For more information</p>
@@ -378,8 +378,8 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
                   ))}
                 </nav>
                 <a href="https://fixion.com.au" target="_blank" rel="noreferrer" style={{ display: "flex", alignItems: "center", padding: "12px 0", borderBottom: `1px solid ${T.border}`, textDecoration: "none", gap: 10 }}>
-                  <img src={FIXION_SRC} alt="Fixion" style={{ height: 28, width: "auto" }} />
-                  <span style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted }}>fixion.com.au ↗</span>
+                  <img src={FIXION_SRC} alt="Fixion" style={{ height: 40, width: "auto" }} />
+                  <span style={{ fontFamily: T.fontSans, fontSize: 14, color: T.textMuted }}>Find it. Fix it.</span>
                 </a>
               <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 28, marginTop: 28 }}>
                   <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 14 }}>For more information</p>
