@@ -320,9 +320,9 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
                 ))}
               </nav>
               <a href="https://fixion.com.au" target="_blank" rel="noreferrer" style={{ display: "block", padding: "12px 0", borderBottom: `1px solid ${T.border}`, textDecoration: "none" }}>
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 10 }}>
-                  <img src={FIXION_SRC} alt="Fixion" style={{ height: 40, width: "auto", display: "block" }} />
-                  <span style={{ fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, lineHeight: 1, marginBottom: 3 }}>Find it. Fix it.</span>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
+                  <img src={FIXION_SRC} alt="Fixion" style={{ height: 40, width: "auto", display: "block", verticalAlign: "bottom" }} />
+                  <span style={{ fontFamily: T.fontSans, fontSize: 13, color: T.textMuted }}>Find it. Fix it.</span>
                 </div>
               </a>
               <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 28, marginTop: 28 }}>
@@ -380,9 +380,9 @@ function PublicSite({ faqs, suppliers, resources, onGoAdmin, suppliersBanner, re
                   ))}
                 </nav>
                 <a href="https://fixion.com.au" target="_blank" rel="noreferrer" style={{ display: "block", padding: "12px 0", borderBottom: `1px solid ${T.border}`, textDecoration: "none" }}>
-                  <div style={{ display: "flex", alignItems: "flex-end", gap: 10 }}>
-                    <img src={FIXION_SRC} alt="Fixion" style={{ height: 40, width: "auto", display: "block" }} />
-                    <span style={{ fontFamily: T.fontSans, fontSize: 13, color: T.textMuted, lineHeight: 1, marginBottom: 3 }}>Find it. Fix it.</span>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
+                    <img src={FIXION_SRC} alt="Fixion" style={{ height: 40, width: "auto", display: "block", verticalAlign: "bottom" }} />
+                    <span style={{ fontFamily: T.fontSans, fontSize: 13, color: T.textMuted }}>Find it. Fix it.</span>
                   </div>
                 </a>
               <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 28, marginTop: 28 }}>
