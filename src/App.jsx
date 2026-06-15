@@ -114,6 +114,23 @@ function AccordionItem({ faq, index }) {
           {(() => {
             const lines = faq.answer.split('\n');
             const hasBullets = lines.some(l => /^\s*[–—\-•\t]/.test(l) && /[–—\-•]/.test(l));
+
+            function renderLine(text) {
+              // Parse **bold** and _italic_ markers
+              const parts = [];
+              const regex = /(\*\*.*?\*\*|_.*?_)/g;
+              let last = 0, m;
+              while ((m = regex.exec(text)) !== null) {
+                if (m.index > last) parts.push(text.slice(last, m.index));
+                const raw = m[0];
+                if (raw.startsWith('**')) parts.push(<strong key={m.index}>{raw.slice(2, -2)}</strong>);
+                else parts.push(<em key={m.index}>{raw.slice(1, -1)}</em>);
+                last = m.index + raw.length;
+              }
+              if (last < text.length) parts.push(text.slice(last));
+              return parts;
+            }
+
             if (hasBullets) {
               return (
                 <div>
@@ -121,23 +138,25 @@ function AccordionItem({ faq, index }) {
                     const isSubBullet = /^\t[–—\-•]\s?/.test(line);
                     const isBullet = !isSubBullet && /^[–—\-•]\s?/.test(line);
                     if (isSubBullet) return (
-                      <div key={i} style={{ display: "flex", gap: 8, marginBottom: 4, paddingLeft: 24 }}>
+                      <div key={i} style={{ display: "flex", gap: 8, marginBottom: 2, paddingLeft: 24 }}>
                         <span style={{ flexShrink: 0 }}>•</span>
-                        <span>{line.replace(/^\t[–—\-•]\s*/, "")}</span>
+                        <span>{renderLine(line.replace(/^\t[–—\-•]\s*/, ""))}</span>
                       </div>
                     );
                     if (isBullet) return (
-                      <div key={i} style={{ display: "flex", gap: 8, marginBottom: 4 }}>
+                      <div key={i} style={{ display: "flex", gap: 8, marginBottom: 2 }}>
                         <span style={{ flexShrink: 0 }}>–</span>
-                        <span>{line.replace(/^[–—\-•]\s*/, "")}</span>
+                        <span>{renderLine(line.replace(/^[–—\-•]\s*/, ""))}</span>
                       </div>
                     );
-                    return line.trim() ? <p key={i} style={{ margin: "0 0 8px 0" }}>{line}</p> : null;
+                    return line.trim()
+                      ? <p key={i} style={{ margin: "6px 0 2px 0", fontWeight: line.startsWith('**') ? 600 : 400 }}>{renderLine(line)}</p>
+                      : <div key={i} style={{ height: 4 }} />;
                   })}
                 </div>
               );
             }
-            return <p style={{ margin: 0 }}>{faq.answer}</p>;
+            return <p style={{ margin: 0 }}>{renderLine(faq.answer)}</p>;
           })()}
         </div>
       </div>
