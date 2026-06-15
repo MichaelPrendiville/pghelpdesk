@@ -706,10 +706,11 @@ function htmlToText(html) {
 
 function textToHtml(text) {
   if (!text) return '';
-  // First, split any inline bullet markers that got squashed together (e.g. "text– next" or "text.– next")
+  // Only split inline bullets that appear after a sentence-end (. ! ?) or after )
+  // to avoid splitting mid-sentence dashes
   let normalised = text
-    .replace(/([^\n])(– )/g, '$1\n– ')   // insert newline before – not already at start of line
-    .replace(/([^\n])(\t– )/g, '$1\n\t– '); // same for sub-bullets
+    .replace(/([.!?)])\s*(– )/g, '$1\n– ')
+    .replace(/([.!?)])\s*(\t– )/g, '$1\n\t– ');
   return normalised.split('\n').map(line => {
     let escaped = line.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/_(.*?)_/g, '<i>$1</i>');
