@@ -706,11 +706,15 @@ function htmlToText(html) {
 
 function textToHtml(text) {
   if (!text) return '';
-  return text.split('\n').map(line => {
+  // First, split any inline bullet markers that got squashed together (e.g. "text– next" or "text.– next")
+  let normalised = text
+    .replace(/([^\n])(– )/g, '$1\n– ')   // insert newline before – not already at start of line
+    .replace(/([^\n])(\t– )/g, '$1\n\t– '); // same for sub-bullets
+  return normalised.split('\n').map(line => {
     let escaped = line.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/_(.*?)_/g, '<i>$1</i>');
-    if (/^\t[–—\-•]\s/.test(line)) return '<div class="sub-bullet">' + escaped.replace(/^\t[–—\-•]\s*/, '') + '</div>';
-    if (/^[–—\-•]\s/.test(line)) return '<div class="bullet">' + escaped.replace(/^[–—\-•]\s*/, '') + '</div>';
+    if (/^\t[–—\-•]\s?/.test(line)) return '<div class="sub-bullet">' + escaped.replace(/^\t[–—\-•]\s*/, '') + '</div>';
+    if (/^[–—\-•]\s?/.test(line)) return '<div class="bullet">' + escaped.replace(/^[–—\-•]\s*/, '') + '</div>';
     return '<div>' + (escaped || '<br>') + '</div>';
   }).join('');
 }
