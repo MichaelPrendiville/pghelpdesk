@@ -113,18 +113,26 @@ function AccordionItem({ faq, index }) {
         <div style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.7, paddingBottom: 18, paddingLeft: 34, margin: 0 }}>
           {(() => {
             const lines = faq.answer.split('\n');
-            const hasBullets = lines.some(l => /^\s*[–—\-•]\s/.test(l));
+            const hasBullets = lines.some(l => /^\s*[–—\-•\t]/.test(l) && /[–—\-•]/.test(l));
             if (hasBullets) {
               return (
                 <div>
-                  {lines.filter(Boolean).map((line, i) => {
-                    const isBullet = /^\s*[–—\-•]\s/.test(line);
-                    return isBullet
-                      ? <div key={i} style={{ display: "flex", gap: 8, marginBottom: 4 }}>
-                          <span>–</span>
-                          <span>{line.replace(/^\s*[–—\-•]\s*/, "")}</span>
-                        </div>
-                      : <p key={i} style={{ margin: "0 0 6px 0" }}>{line}</p>;
+                  {lines.map((line, i) => {
+                    const isSubBullet = /^\t[–—\-•]\s?/.test(line);
+                    const isBullet = !isSubBullet && /^[–—\-•]\s?/.test(line);
+                    if (isSubBullet) return (
+                      <div key={i} style={{ display: "flex", gap: 8, marginBottom: 4, paddingLeft: 24 }}>
+                        <span style={{ flexShrink: 0 }}>–</span>
+                        <span>{line.replace(/^\t[–—\-•]\s*/, "")}</span>
+                      </div>
+                    );
+                    if (isBullet) return (
+                      <div key={i} style={{ display: "flex", gap: 8, marginBottom: 4 }}>
+                        <span style={{ flexShrink: 0 }}>–</span>
+                        <span>{line.replace(/^[–—\-•]\s*/, "")}</span>
+                      </div>
+                    );
+                    return line.trim() ? <p key={i} style={{ margin: "0 0 8px 0" }}>{line}</p> : null;
                   })}
                 </div>
               );
@@ -679,20 +687,20 @@ function AdminLogin({ onLogin, onBack }) {
 
 // ── Rich Text Editor ─────────────────────────────────────────────────────────
 function htmlToText(html) {
-  // Convert HTML back to our plain text format with markers
+  // Add newline before each closing div so content is separated
   return html
-    .replace(/<div class="sub-bullet">/g, '\t– ')
-    .replace(/<div class="bullet">/g, '– ')
-    .replace(/<div><br><\/div>/g, '\n')
+    .replace(/<div class="sub-bullet">/g, '\n\t– ')
+    .replace(/<div class="bullet">/g, '\n– ')
+    .replace(/<\/div>/g, '\n')
     .replace(/<div>/g, '\n')
-    .replace(/<\/div>/g, '')
-    .replace(/<br>/g, '\n')
+    .replace(/<br\s*\/?>/g, '\n')
     .replace(/<b>(.*?)<\/b>/g, '**$1**')
     .replace(/<strong>(.*?)<\/strong>/g, '**$1**')
     .replace(/<i>(.*?)<\/i>/g, '_$1_')
     .replace(/<em>(.*?)<\/em>/g, '_$1_')
     .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     .replace(/&nbsp;/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')  // collapse excess newlines
     .trim();
 }
 
