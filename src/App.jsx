@@ -687,12 +687,12 @@ function AdminLogin({ onLogin, onBack }) {
 
 // ── Rich Text Editor ─────────────────────────────────────────────────────────
 function htmlToText(html) {
-  // Add newline before each closing div so content is separated
+  // Parse div by div to avoid double newlines
   return html
-    .replace(/<div class="sub-bullet">/g, '\n\t– ')
-    .replace(/<div class="bullet">/g, '\n– ')
-    .replace(/<\/div>/g, '\n')
-    .replace(/<div>/g, '\n')
+    .replace(/<div class="sub-bullet">(.*?)<\/div>/g, '\n\t– $1')
+    .replace(/<div class="bullet">(.*?)<\/div>/g, '\n– $1')
+    .replace(/<div><br><\/div>/g, '\n')
+    .replace(/<div>(.*?)<\/div>/g, '\n$1')
     .replace(/<br\s*\/?>/g, '\n')
     .replace(/<b>(.*?)<\/b>/g, '**$1**')
     .replace(/<strong>(.*?)<\/strong>/g, '**$1**')
@@ -700,7 +700,7 @@ function htmlToText(html) {
     .replace(/<em>(.*?)<\/em>/g, '_$1_')
     .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     .replace(/&nbsp;/g, ' ')
-    .replace(/\n{3,}/g, '\n\n')  // collapse excess newlines
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
 
