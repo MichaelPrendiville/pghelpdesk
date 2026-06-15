@@ -122,7 +122,7 @@ function AccordionItem({ faq, index }) {
                     const isBullet = !isSubBullet && /^[–—\-•]\s?/.test(line);
                     if (isSubBullet) return (
                       <div key={i} style={{ display: "flex", gap: 8, marginBottom: 4, paddingLeft: 24 }}>
-                        <span style={{ flexShrink: 0 }}>–</span>
+                        <span style={{ flexShrink: 0 }}>•</span>
                         <span>{line.replace(/^\t[–—\-•]\s*/, "")}</span>
                       </div>
                     );
@@ -789,7 +789,7 @@ function RichEditor({ value, onChange }) {
         .rich-editor .bullet { padding-left: 20px; position: relative; }
         .rich-editor .bullet::before { content: "–"; position: absolute; left: 4px; }
         .rich-editor .sub-bullet { padding-left: 44px; position: relative; }
-        .rich-editor .sub-bullet::before { content: "–"; position: absolute; left: 28px; }
+        .rich-editor .sub-bullet::before { content: "•"; position: absolute; left: 28px; }
       `}</style>
       {/* Toolbar */}
       <div style={{ display: "flex", gap: 4, padding: "6px 8px", borderBottom: `1px solid ${T.border}`, background: T.bg, flexWrap: "wrap" }}>
