@@ -112,18 +112,21 @@ function AccordionItem({ faq, index }) {
       <div style={{ maxHeight: open ? "600px" : 0, overflow: "hidden", transition: "max-height 0.5s cubic-bezier(0.4,0,0.2,1)" }}>
         <div style={{ fontFamily: T.fontSans, fontSize: 15, color: T.textMuted, lineHeight: 1.7, paddingBottom: 18, paddingLeft: 34, margin: 0 }}>
           {(() => {
-            const lines = faq.answer.split(/\n|(?=\s*[–—-]\s)/);
-            const bullets = lines.map(l => l.trim()).filter(l => l.match(/^[–—-]\s/));
-            if (bullets.length > 1) {
-              const parts = faq.answer.split(/\n/).map(l => l.trim()).filter(Boolean);
+            const lines = faq.answer.split('\n');
+            const hasBullets = lines.some(l => /^\s*[–—\-•]\s/.test(l));
+            if (hasBullets) {
               return (
-                <ul style={{ paddingLeft: 18, margin: 0 }}>
-                  {parts.map((part, i) => (
-                    <li key={i} style={{ marginBottom: 6, listStyleType: "disc" }}>
-                      {part.replace(/^[–—-]\s*/, "")}
-                    </li>
-                  ))}
-                </ul>
+                <div>
+                  {lines.filter(Boolean).map((line, i) => {
+                    const isBullet = /^\s*[–—\-•]\s/.test(line);
+                    return isBullet
+                      ? <div key={i} style={{ display: "flex", gap: 8, marginBottom: 4 }}>
+                          <span>–</span>
+                          <span>{line.replace(/^\s*[–—\-•]\s*/, "")}</span>
+                        </div>
+                      : <p key={i} style={{ margin: "0 0 6px 0" }}>{line}</p>;
+                  })}
+                </div>
               );
             }
             return <p style={{ margin: 0 }}>{faq.answer}</p>;
@@ -673,6 +676,131 @@ function AdminLogin({ onLogin, onBack }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // ADMIN CMS
 // ═══════════════════════════════════════════════════════════════════════════════
+
+// ── Rich Text Editor ─────────────────────────────────────────────────────────
+function htmlToText(html) {
+  // Convert HTML back to our plain text format with markers
+  return html
+    .replace(/<div class="sub-bullet">/g, '\t– ')
+    .replace(/<div class="bullet">/g, '– ')
+    .replace(/<div><br><\/div>/g, '\n')
+    .replace(/<div>/g, '\n')
+    .replace(/<\/div>/g, '')
+    .replace(/<br>/g, '\n')
+    .replace(/<b>(.*?)<\/b>/g, '**$1**')
+    .replace(/<strong>(.*?)<\/strong>/g, '**$1**')
+    .replace(/<i>(.*?)<\/i>/g, '_$1_')
+    .replace(/<em>(.*?)<\/em>/g, '_$1_')
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .trim();
+}
+
+function textToHtml(text) {
+  if (!text) return '';
+  return text.split('\n').map(line => {
+    let escaped = line.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/_(.*?)_/g, '<i>$1</i>');
+    if (/^\t[–—\-•]\s/.test(line)) return '<div class="sub-bullet">' + escaped.replace(/^\t[–—\-•]\s*/, '') + '</div>';
+    if (/^[–—\-•]\s/.test(line)) return '<div class="bullet">' + escaped.replace(/^[–—\-•]\s*/, '') + '</div>';
+    return '<div>' + (escaped || '<br>') + '</div>';
+  }).join('');
+}
+
+function RichEditor({ value, onChange }) {
+  const ref = useRef(null);
+  const lastVal = useRef(value);
+
+  useEffect(() => {
+    if (ref.current && value !== lastVal.current) {
+      ref.current.innerHTML = textToHtml(value);
+      lastVal.current = value;
+    }
+  }, [value]);
+
+  useEffect(() => {
+    if (ref.current) ref.current.innerHTML = textToHtml(value);
+  }, []);
+
+  function cmd(command, val) {
+    ref.current.focus();
+    document.execCommand(command, false, val);
+    sync();
+  }
+
+  function insertBullet(prefix) {
+    ref.current.focus();
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    // Find the current block element
+    let block = range.startContainer;
+    while (block && block.parentNode !== ref.current) block = block.parentNode;
+    if (block && block !== ref.current) {
+      const cls = block.className;
+      if (prefix === '– ' && cls === 'bullet') {
+        // Already bullet, toggle off
+        block.className = '';
+        block.innerHTML = block.innerHTML;
+      } else if (prefix === '\t– ' && cls === 'sub-bullet') {
+        // Already sub-bullet, toggle to bullet
+        block.className = 'bullet';
+      } else if (prefix === '– ') {
+        block.className = 'bullet';
+      } else {
+        block.className = 'sub-bullet';
+      }
+    }
+    sync();
+  }
+
+  function sync() {
+    const text = htmlToText(ref.current.innerHTML);
+    lastVal.current = text;
+    onChange(text);
+  }
+
+  const btnStyle = (active) => ({
+    fontFamily: T.fontSans, fontSize: 12, fontWeight: 600,
+    color: active ? T.surface : T.text,
+    background: active ? T.text : T.surface,
+    border: `1px solid ${T.border}`, borderRadius: 3,
+    padding: "3px 8px", cursor: "pointer", lineHeight: 1.4,
+  });
+
+  return (
+    <div style={{ border: `1px solid ${T.border}`, borderRadius: 6, overflow: "hidden", background: T.surface }}>
+      <style>{`
+        .rich-editor { outline: none; min-height: 120px; padding: 10px 12px; font-family: ${T.fontSans}; font-size: 14px; color: ${T.text}; line-height: 1.7; }
+        .rich-editor div { margin: 0; }
+        .rich-editor .bullet { padding-left: 20px; position: relative; }
+        .rich-editor .bullet::before { content: "–"; position: absolute; left: 4px; }
+        .rich-editor .sub-bullet { padding-left: 44px; position: relative; }
+        .rich-editor .sub-bullet::before { content: "–"; position: absolute; left: 28px; }
+      `}</style>
+      {/* Toolbar */}
+      <div style={{ display: "flex", gap: 4, padding: "6px 8px", borderBottom: `1px solid ${T.border}`, background: T.bg, flexWrap: "wrap" }}>
+        <button style={btnStyle(false)} onMouseDown={e => { e.preventDefault(); cmd('bold'); }} title="Bold"><b>B</b></button>
+        <button style={btnStyle(false)} onMouseDown={e => { e.preventDefault(); cmd('italic'); }} title="Italic"><i>I</i></button>
+        <div style={{ width: 1, background: T.border, margin: "0 2px" }} />
+        <button style={btnStyle(false)} onMouseDown={e => { e.preventDefault(); insertBullet('– '); }} title="Bullet point">• List</button>
+        <button style={btnStyle(false)} onMouseDown={e => { e.preventDefault(); insertBullet('\t– '); }} title="Sub bullet">⤷ Sub</button>
+        <div style={{ width: 1, background: T.border, margin: "0 2px" }} />
+        <button style={btnStyle(false)} onMouseDown={e => { e.preventDefault(); cmd('removeFormat'); }} title="Clear formatting">✕ Clear</button>
+      </div>
+      {/* Editor area */}
+      <div
+        ref={ref}
+        contentEditable
+        className="rich-editor"
+        onInput={sync}
+        data-placeholder="Write the answer…"
+        style={{ outline: "none", minHeight: 120, padding: "10px 12px", fontFamily: T.fontSans, fontSize: 14, color: T.text, lineHeight: 1.7 }}
+      />
+    </div>
+  );
+}
+
 function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppliersBanner, resourcesBanner, setResourcesBanner, heroLogo, setHeroLogo, heroImage, setHeroImage, faqsBanner, setFaqsBanner, onLogout, onViewSite }) {
   const { addFaq, updateFaq, deleteFaq: dbDeleteFaq, reorderFaqs, addSupplier, updateSupplier, deleteSupplier: dbDeleteSupplier, reorderSuppliers, addResource, updateResource, deleteResource, reorderResources } = dbOps;
   const [activeTab, setActiveTab] = useState("faqs");
@@ -704,9 +832,9 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
   function showToast(msg) { setToast(msg); setTimeout(() => setToast(null), 2200); }
 
   // FAQ functions
-  function startEdit(faq) { setEditing(faq.id); setForm({ question: faq.question, answer: faq.answer }); }
-  function startNew() { setEditing("new"); setForm({ question: "", answer: "" }); }
-  function cancelEdit() { setEditing(null); setForm({ question: "", answer: "" }); }
+  function startEdit(faq) { setEditing(faq.id); setForm({ question: faq.question, answer: faq.answer, topic: faq.topic || "" }); }
+  function startNew() { setEditing("new"); setForm({ question: "", answer: "", topic: "" }); }
+  function cancelEdit() { setEditing(null); setForm({ question: "", answer: "", topic: "" }); }
   async function saveEdit() {
     if (!form.question.trim() || !form.answer.trim()) return;
     if (editing === "new") { await addFaq(form); showToast("Creative Process published"); }
@@ -812,10 +940,14 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
                 <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Question</span>
                 <input value={form.question} onChange={e => setForm(f => ({ ...f, question: e.target.value }))} placeholder="What is the creative process?" style={fieldStyle} />
               </label>
-              <label style={{ display: "block", marginBottom: 16 }}>
-                <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Answer</span>
-                <textarea value={form.answer} onChange={e => setForm(f => ({ ...f, answer: e.target.value }))} placeholder="Write the answer…" rows={4} style={{ ...fieldStyle, resize: "vertical" }} />
+              <label style={{ display: "block", marginBottom: 12 }}>
+                <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Topic <span style={{ color: T.textXMuted, fontWeight: 400 }}>(optional — used for filtering)</span></span>
+                <input value={form.topic || ""} onChange={e => setForm(f => ({ ...f, topic: e.target.value }))} placeholder="e.g. Marketing, Branding, Design…" style={fieldStyle} />
               </label>
+              <div style={{ marginBottom: 16 }}>
+                <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Answer</span>
+                <RichEditor value={form.answer} onChange={val => setForm(f => ({ ...f, answer: val }))} />
+              </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <button onClick={saveEdit} style={{ background: T.text, color: T.bg, border: "none", borderRadius: 4, padding: "8px 18px", fontFamily: T.fontSans, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
                   {editing === "new" ? "Publish" : "Save changes"}
