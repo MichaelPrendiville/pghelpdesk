@@ -807,7 +807,11 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
 
   // FAQ state
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ question: "", answer: "" });
+  const [form, setForm] = useState({ question: "", answer: "", topic: "" });
+  const [topics, setTopics] = useState(() => { try { return JSON.parse(localStorage.getItem("pg_topics") || "[]"); } catch { return []; } });
+  const [newTopic, setNewTopic] = useState("");
+  const [supplierCategories, setSupplierCategories] = useState(() => { try { return JSON.parse(localStorage.getItem("pg_supplier_cats") || "[]"); } catch { return []; } });
+  const [newSupplierCat, setNewSupplierCat] = useState("");
   const [dragIdx, setDragIdx] = useState(null);
   const [overIdx, setOverIdx] = useState(null);
   const [query, setQuery] = useState("");
@@ -835,6 +839,32 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
   function startEdit(faq) { setEditing(faq.id); setForm({ question: faq.question, answer: faq.answer, topic: faq.topic || "" }); }
   function startNew() { setEditing("new"); setForm({ question: "", answer: "", topic: "" }); }
   function cancelEdit() { setEditing(null); setForm({ question: "", answer: "", topic: "" }); }
+  function saveTopic() {
+    const t = newTopic.trim();
+    if (!t || topics.includes(t)) return;
+    const updated = [...topics, t];
+    setTopics(updated);
+    try { localStorage.setItem("pg_topics", JSON.stringify(updated)); } catch {}
+    setNewTopic("");
+  }
+  function deleteTopic(t) {
+    const updated = topics.filter(x => x !== t);
+    setTopics(updated);
+    try { localStorage.setItem("pg_topics", JSON.stringify(updated)); } catch {}
+  }
+  function saveSupplierCat() {
+    const c = newSupplierCat.trim();
+    if (!c || supplierCategories.includes(c)) return;
+    const updated = [...supplierCategories, c];
+    setSupplierCategories(updated);
+    try { localStorage.setItem("pg_supplier_cats", JSON.stringify(updated)); } catch {}
+    setNewSupplierCat("");
+  }
+  function deleteSupplierCat(c) {
+    const updated = supplierCategories.filter(x => x !== c);
+    setSupplierCategories(updated);
+    try { localStorage.setItem("pg_supplier_cats", JSON.stringify(updated)); } catch {}
+  }
   async function saveEdit() {
     if (!form.question.trim() || !form.answer.trim()) return;
     if (editing === "new") { await addFaq(form); showToast("Creative Process published"); }
@@ -915,6 +945,32 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
           </p>
           <div style={{ borderTop: `1px solid ${T.border}`, marginBottom: 20 }} />
 
+          {/* Topic manager */}
+          <div style={{ background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "16px 18px", marginBottom: 24 }}>
+            <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Manage Topics</p>
+            <div style={{ display: "flex", gap: 8, marginBottom: topics.length > 0 ? 12 : 0 }}>
+              <input
+                value={newTopic}
+                onChange={e => setNewTopic(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && saveTopic()}
+                placeholder="New topic name…"
+                style={{ ...fieldStyle, flex: 1 }}
+              />
+              <button onClick={saveTopic} style={{ background: T.text, color: T.bg, border: "none", borderRadius: 4, padding: "8px 14px", fontFamily: T.fontSans, fontSize: 13, fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap" }}>Add</button>
+            </div>
+            {topics.length > 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {topics.map(t => (
+                  <span key={t} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: T.surface, border: `1px solid ${T.border}`, borderRadius: 20, padding: "4px 12px", fontFamily: T.fontSans, fontSize: 13, color: T.text }}>
+                    {t}
+                    <button onClick={() => deleteTopic(t)} style={{ background: "none", border: "none", cursor: "pointer", color: T.textMuted, fontSize: 14, lineHeight: 1, padding: 0 }}>×</button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+
           <button onClick={startNew} style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textMuted, letterSpacing: "0.1em", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, marginBottom: 20, textTransform: "uppercase" }}>
             <span style={{ fontSize: 14 }}>+</span> ADD NEW FAQ
           </button>
@@ -941,8 +997,11 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
                 <input value={form.question} onChange={e => setForm(f => ({ ...f, question: e.target.value }))} placeholder="What is the creative process?" style={fieldStyle} />
               </label>
               <label style={{ display: "block", marginBottom: 12 }}>
-                <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Topic <span style={{ color: T.textXMuted, fontWeight: 400 }}>(optional — used for filtering)</span></span>
-                <input value={form.topic || ""} onChange={e => setForm(f => ({ ...f, topic: e.target.value }))} placeholder="e.g. Marketing, Branding, Design…" style={fieldStyle} />
+                <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Topic</span>
+                <select value={form.topic || ""} onChange={e => setForm(f => ({ ...f, topic: e.target.value }))} style={{ ...fieldStyle, appearance: "none", cursor: "pointer" }}>
+                  <option value="">— No topic —</option>
+                  {topics.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
               </label>
               <div style={{ marginBottom: 16 }}>
                 <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Answer</span>
@@ -997,6 +1056,32 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
           </p>
           <div style={{ borderTop: `1px solid ${T.border}`, marginBottom: 20 }} />
 
+          {/* Category manager */}
+          <div style={{ background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8, padding: "16px 18px", marginBottom: 24 }}>
+            <p style={{ fontFamily: T.fontMono, fontSize: 10, color: T.textXMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Manage Categories</p>
+            <div style={{ display: "flex", gap: 8, marginBottom: supplierCategories.length > 0 ? 12 : 0 }}>
+              <input
+                value={newSupplierCat}
+                onChange={e => setNewSupplierCat(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && saveSupplierCat()}
+                placeholder="New category name…"
+                style={{ ...fieldStyle, flex: 1 }}
+              />
+              <button onClick={saveSupplierCat} style={{ background: T.text, color: T.bg, border: "none", borderRadius: 4, padding: "8px 14px", fontFamily: T.fontSans, fontSize: 13, fontWeight: 500, cursor: "pointer", whiteSpace: "nowrap" }}>Add</button>
+            </div>
+            {supplierCategories.length > 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {supplierCategories.map(c => (
+                  <span key={c} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: T.surface, border: `1px solid ${T.border}`, borderRadius: 20, padding: "4px 12px", fontFamily: T.fontSans, fontSize: 13, color: T.text }}>
+                    {c}
+                    <button onClick={() => deleteSupplierCat(c)} style={{ background: "none", border: "none", cursor: "pointer", color: T.textMuted, fontSize: 14, lineHeight: 1, padding: 0 }}>×</button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+
           <button onClick={startNewSupplier} style={{ fontFamily: T.fontMono, fontSize: 11, color: T.textMuted, letterSpacing: "0.1em", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, marginBottom: 20, textTransform: "uppercase" }}>
             <span style={{ fontSize: 14 }}>+</span> ADD NEW SUPPLIER
           </button>
@@ -1025,7 +1110,10 @@ function AdminCMS({ faqs, suppliers, resources, dbOps, suppliersBanner, setSuppl
                 </label>
                 <label>
                   <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Category</span>
-                  <input value={supplierForm.category} onChange={e => setSupplierForm(f => ({ ...f, category: e.target.value }))} placeholder="e.g. Electrical" style={fieldStyle} />
+                  <select value={supplierForm.category} onChange={e => setSupplierForm(f => ({ ...f, category: e.target.value }))} style={{ ...fieldStyle, appearance: "none", cursor: "pointer" }}>
+                  <option value="">— No category —</option>
+                  {supplierCategories.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
                 </label>
                 <label>
                   <span style={{ display: "block", fontFamily: T.fontMono, fontSize: 10, color: T.textMuted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 5 }}>Contact Name</span>
